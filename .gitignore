@@ -1,0 +1,12 @@
+# Prevent sensitive and unnecessary files from being tracked
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+.DS_Store
+.idea/
+.vscode/
+*.log
