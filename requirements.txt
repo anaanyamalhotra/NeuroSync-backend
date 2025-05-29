@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+requests
+textblob
+tldextract
+psycopg2
+numpy
