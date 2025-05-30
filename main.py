@@ -114,44 +114,73 @@ async def generate(data: TwinRequest):
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
-        print("== 🧠 Reflect request in ==")
+        print("== Incoming Reflect Request ==")
+        print(data)
 
         def analyze_neuro(nt):
             suggestions = []
             if nt.get("dopamine", 0.5) < 0.4:
-                suggestions.append("Dopamine dip detected — aim for quick wins and minty scents.")
+                suggestions.append("Dopamine is low — try mint or cinnamon, or celebrate small wins.")
             if nt.get("serotonin", 0.5) < 0.4:
-                suggestions.append("Mood might be low. Try citrus exposure or daylight.")
+                suggestions.append("Low serotonin? Sunshine, citrus scents, or journaling may help.")
             if nt.get("oxytocin", 0.5) < 0.4:
-                suggestions.append("Oxytocin is low. You may benefit from warm scents or chats with a friend.")
+                suggestions.append("Oxytocin seems low — reconnect with friends or try vanilla or rose scents.")
             if nt.get("GABA", 0.5) < 0.4:
-                suggestions.append("GABA is down — lavender or calm-focused gaming helps.")
+                suggestions.append("GABA is low. Try lavender, quiet time, or calming music.")
             if nt.get("cortisol", 0.5) > 0.7:
-                suggestions.append("Cortisol is high. Deep breaths. Bergamot. Distraction helps.")
+                suggestions.append("Cortisol is high — breathe deeply, take breaks, and avoid multitasking.")
             return suggestions
 
+        def local_fallback():
+            insights = analyze_neuro(data.neurotransmitters)
+            game_reco = f"🎮 Play: {data.xbox_game or 'a focus-friendly game'} ({data.game_mode}), for ~{data.duration_minutes} mins. Switch: {data.switch_time}."
+            tips = "\n".join(f"- {tip}" for tip in insights)
+            return f"""
+🧠 Today’s Reflection for {data.name}  
+Your brain chemistry suggests:  
+{tips}
+
+{game_reco}  
+Stay mindful and pace your energy today.
+"""
+
+        # Build GPT prompt
         def build_prompt():
             insights = analyze_neuro(data.neurotransmitters or {})
-            prompt = (
-                f"My name is {data.name}. I'm feeling {data.current_emotion}. "
-                f"Today, {data.recent_events}. My goals: {data.goals}. "
-                f"Neurochemically: {', '.join(insights)} "
-                f"Game: {data.xbox_game} in {data.game_mode} mode, ~{data.duration_minutes} minutes. "
-                f"Switch after: {data.switch_time}. "
-                f"Suggest a scent, mood tactic, and playlist."
+            joined_insights = "\n".join(insights)
+            game_reco = f"Today’s game: {data.xbox_game} ({data.game_mode}), play for ~{data.duration_minutes} minutes, then switch: {data.switch_time}."
+            playlist = f"We’ve also curated a Spotify playlist for today: {data.name}'s {data.game_mode} Vibes 🎶"
+            return (
+                f"My name is {data.name}. I feel {data.current_emotion}. "
+                f"Recent events include: {data.recent_events}. My goals are: {data.goals}. "
+                f"Based on my brain chemistry, here's what's going on: {joined_insights}. "
+                f"{game_reco} Suggest a daily routine, calming scent and a Spotify playlist to help."
             )
-            return prompt
 
+        prompt = build_prompt()
+
+        # Call GPT
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a friendly mental wellness coach who connects scent, emotion, and game data to suggest personalized, motivational reflections."},
-                {"role": "user", "content": build_prompt()}
+                {
+                    "role": "system",
+                    "content": (
+                        "You're a motivational mental wellness coach who interprets emotional state, brain chemistry, "
+                        "and gaming focus to offer an uplifting reflection with practical guidance. Keep it kind, clear, and actionable."
+                    )
+                },
+                {"role": "user", "content": prompt}
             ]
         )
-        journal = response.choices[0].message.content.strip()
-        return {"journal_entry": journal}
-    except Exception as e:
-        print("❌ ERROR in /reflect:", str(e))
-        return {"journal_entry": f"🧠 Error: {str(e)}"}
 
+        journal = response.choices[0].message.content.strip()
+
+        if not journal:
+            raise ValueError("GPT returned empty response")
+
+        return {"journal_entry": journal}
+
+    except Exception as e:
+        print("❌ GPT fallback triggered due to:", e)
+        return {"journal_entry": local_fallback()}
