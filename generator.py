@@ -4,6 +4,11 @@ from datetime import datetime
 import json
 import re
 import requests
+import json
+import os
+
+with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
+    fragrance_db = json.load(f)
 
 # === Request Model ===
 class TwinRequest(BaseModel):
@@ -32,14 +37,6 @@ scent_map = {
     "cinnamon": {"dopamine": 0.1},
     "tonka bean": {"oxytocin": 0.1},
     "linalool": {"GABA": 0.1}
-}
-
-fragrance_db = {
-    "versace eros": ["vanilla", "tonka bean", "mint"],
-    "chanel no 5": ["citrus", "rose", "musk"],
-    "dior sauvage": ["bergamot", "pepper", "ambroxan"],
-    "jo malone lime basil": ["lime", "basil", "white thyme"],
-    "bath and body works eucalyptus mint": ["eucalyptus", "mint"]
 }
 
 stress_map = {
