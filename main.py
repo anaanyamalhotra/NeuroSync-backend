@@ -7,6 +7,8 @@ import json
 import os
 import random
 import requests
+import openai
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -25,6 +27,8 @@ with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") 
 
 with open(os.path.join(os.path.dirname(__file__), "game_profiles.json"), "r") as f:
     game_profiles = json.load(f)
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # === Mappings ===
 scent_map = {
@@ -182,6 +186,33 @@ async def generate(data: TwinRequest):
 
         print("== ✅ Twin + Game output ==")
         print(twin)
+
+@app.post("/reflect")
+async def reflect(data: ReflectRequest):
+    try:
+        prompt = (
+            f"{data.name} is feeling {data.current_emotion}. "
+            f"Recently, they experienced: {data.recent_events}. "
+            f"Their current goals are: {data.goals}. "
+            f"Write a compassionate, reflective journal entry that helps them process their thoughts and stay focused."
+        )
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # Or "gpt-3.5-turbo" if cost/speed is a concern
+            messages=[
+                {"role": "system", "content": "You are a supportive journaling coach who helps users reflect on emotions."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
+
+        journal = response["choices"][0]["message"]["content"]
+        return {"journal_entry": journal}
+
+    except Exception as e:
+        print("❌ ERROR in /reflect:", str(e))
+        raise HTTPException(status_code=500, detail=str(e))
+
 
         return twin
     except Exception as e:
