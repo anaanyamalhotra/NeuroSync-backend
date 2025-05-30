@@ -28,7 +28,6 @@ with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") 
 with open(os.path.join(os.path.dirname(__file__), "game_profiles.json"), "r") as f:
     game_profiles = json.load(f)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # === Mappings ===
 scent_map = {
