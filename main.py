@@ -68,6 +68,11 @@ class ReflectRequest(BaseModel):
     current_emotion: str
     recent_events: str
     goals: str
+    neurotransmitters: dict
+    xbox_game: str
+    game_mode: str
+    duration_minutes: int
+    switch_time: str
 
 # === Helper functions ===
 def get_fragrance_notes(scent):
@@ -217,6 +222,7 @@ async def reflect(data: ReflectRequest):
             insights = analyze_neuro(data.neurotransmitters or {})
             joined_insights = "\n".join(insights)
             game_reco = f"Today’s game: {data.xbox_game} ({data.game_mode}), play for ~{data.duration_minutes} minutes, then switch: {data.switch_time}."
+            playlist = f"We’ve also curated a Spotify playlist for today: {data.name}'s {data.game_mode} Vibes 🎶"
             return (
                 f"My name is {data.name}. I feel {data.current_emotion}. "
                 f"Recent events include: {data.recent_events}. My goals are: {data.goals}. "
