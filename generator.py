@@ -101,7 +101,17 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 # === Vector Generation ===
 def generate_twin_vector(data: TwinRequest):
     # Random baselines
-    nt = {k: round(random.uniform(0.45, 0.55), 2) for k in ["dopamine", "serotonin", "oxytocin", "GABA", "cortisol"]}
+    baseline_nt = {
+        "dopamine": 0.55,
+        "serotonin": 0.60,
+        "oxytocin": 0.50,
+        "GABA": 0.45,
+        "cortisol": 0.40
+    }
+    nt = {}
+    for k, base in baseline_nt.items():
+        noise = random.uniform(-0.05, 0.05)
+        nt[k] = round(min(1, max(0, base + noise)), 2)
     
     gender = infer_gender(data.name)
     if gender == "female":
