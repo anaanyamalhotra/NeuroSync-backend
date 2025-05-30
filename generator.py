@@ -86,15 +86,6 @@ def apply_modifiers(base, modifiers):
     for nt, val in modifiers.items():
         base[nt] = base.get(nt, 0.5) + val
 
-def generate_twin_vector(data: TwinRequest):
-    nt = {
-        "dopamine": 0.5,
-        "serotonin": 0.5,
-        "oxytocin": 0.5,
-        "GABA": 0.5,
-        "cortisol": 0.5
-    }
-
 def infer_life_stage(job_title: str, career_goals: str) -> str:
     text = f"{job_title} {career_goals}".lower()
 
@@ -107,12 +98,43 @@ def infer_life_stage(job_title: str, career_goals: str) -> str:
     else:
         return "adult"
 
+def log_journal_entry(data: TwinRequest, vector_output: dict):
+    log_dir = "journal_logs"
+    os.makedirs(log_dir, exist_ok=True)
+    filename = data.email.replace("@", "_at_") + ".txt" if data.email else "anonymous_log.txt"
+    log_path = os.path.join(log_dir, filename)
+
+    entry = f"""
+Timestamp: {vector_output['timestamp']}
+Name: {data.name}
+Age: {data.age}
+Gender: {vector_output['gender']}
+Neurotransmitters: {vector_output['neurotransmitters']}
+Game: {vector_output.get("xbox_game", "N/A")}
+Playlist: {vector_output.get("spotify_playlist", "N/A")}
+Reflection: generated from Twin vector
+----------------------------
+"""
+    with open(log_path, "a") as f:
+        f.write(entry)
+
+def generate_twin_vector(data: TwinRequest):
+    nt = {
+        "dopamine": round(random.uniform(0.45, 0.55), 2),
+        "serotonin": round(random.uniform(0.45, 0.55), 2),
+        "oxytocin": round(random.uniform(0.45, 0.55), 2),
+        "GABA": round(random.uniform(0.45, 0.55), 2),
+        "cortisol": round(random.uniform(0.45, 0.55), 2)
+    }
+
     # Inferred gender tweak
     gender = infer_gender_from_name(data.name) or data.gender
     if gender == "female":
         nt["oxytocin"] += 0.05
     elif gender == "male":
         nt["dopamine"] += 0.05
+    life_stage = infer_life_stage(data.job_title or "", data.career_goals or "")
+
 
     # Apply scent effects
     notes = get_fragrance_notes(data.scent_note)
@@ -158,8 +180,13 @@ def infer_life_stage(job_title: str, career_goals: str) -> str:
         "name": data.name,
         "age": data.age,
         "gender": gender,
+        "life_stage": life_stage, 
         "neurotransmitters": nt,
         "brain_regions": brain_regions,
         "subvectors": subvectors,
         "timestamp": datetime.utcnow().isoformat()
     }
+    
+    log_journal_entry(data, output)
+
+    return output
