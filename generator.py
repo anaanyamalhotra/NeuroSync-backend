@@ -1,16 +1,39 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
-import json
+from typing import List, Optional, Dict
 import re
-import requests
 import json
 import os
+from datetime import datetime
+import requests
+from textblob import TextBlob
+import tldextract
+import psycopg2
 
+# === Load fragrance notes JSON ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
-# === Request Model ===
+# === Mapping Tables ===
+scent_map = {
+    "lavender": {"GABA": 0.1},
+    "vanilla": {"oxytocin": 0.1},
+    "mint": {"dopamine": 0.1},
+    "citrus": {"serotonin": 0.1},
+    "rose": {"oxytocin": 0.1},
+    "bergamot": {"serotonin": 0.1},
+    "cinnamon": {"dopamine": 0.1},
+    "tonka bean": {"oxytocin": 0.1},
+    "linalool": {"GABA": 0.1}
+}
+
+stress_map = {
+    "deadline": {"cortisol": 0.2, "GABA": -0.1},
+    "burnout": {"cortisol": 0.3, "dopamine": -0.1},
+    "lonely": {"oxytocin": -0.2},
+    "exam": {"cortisol": 0.2, "dopamine": 0.05},
+    "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
+}
+
 class TwinRequest(BaseModel):
     name: str
     age: int
