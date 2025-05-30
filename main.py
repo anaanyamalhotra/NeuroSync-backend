@@ -117,7 +117,7 @@ async def generate(data: TwinRequest):
     try:
         print("== ✅ Request received at /generate ==")
         twin = generate_twin_vector(data)
-        game = match_game(data.scent_note, data.productivity_limiters)
+        game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
         twin.update(game)
         twin["timestamp"] = datetime.utcnow().isoformat()
         print("== ✅ Final Output ==")
