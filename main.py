@@ -188,12 +188,12 @@ async def generate(data: TwinRequest):
         print(data)
 
         twin = generate_twin_vector(data)
-        game = match_game(data.scent_note, data.productivity_limiters)
+        game = match_game(data.scent_note, data.productivity_limiters or "")
         twin.update(game)
 
         print("== ✅ Twin + Game output ==")
         print(twin)
-        return twin  # <- REQUIRED to return a response
+        return twin
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
