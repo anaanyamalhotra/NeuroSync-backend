@@ -7,10 +7,9 @@ import json
 import os
 import random
 import requests
-import openai
+import openai import OpenAI
 from fastapi import HTTPException
 
-from openai import OpenAI
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = FastAPI()
