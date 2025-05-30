@@ -190,31 +190,23 @@ async def generate(data: TwinRequest):
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
-        prompt = (
-            f"{data.name} is feeling {data.current_emotion}. "
-            f"Recently, they experienced: {data.recent_events}. "
-            f"Their current goals are: {data.goals}. "
-            f"Write a compassionate, reflective journal entry that helps them process their thoughts and stay focused."
-        )
-
+        openai.api_key = os.getenv("OPENAI_API_KEY")
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # Or "gpt-3.5-turbo" if cost/speed is a concern
+            model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a supportive journaling coach who helps users reflect on emotions."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7
+                {
+                    "role": "system",
+                    "content": "You are a gentle, motivational journal assistant who helps users process emotions through reflection."
+                },
+                {
+                    "role": "user",
+                    "content": f"My name is {data.name}. I feel {data.current_emotion}. Recent events include: {data.recent_events}. My goals are: {data.goals}."
+                }
+            ]
         )
-
         journal = response["choices"][0]["message"]["content"]
         return {"journal_entry": journal}
-
+    
     except Exception as e:
         print("❌ ERROR in /reflect:", str(e))
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-        return twin
-    except Exception as e:
-        print("❌ ERROR in /generate:", str(e))
         return {"error": str(e)}
