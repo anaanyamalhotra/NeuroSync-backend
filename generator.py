@@ -222,7 +222,7 @@ def generate_twin_vector(data: TwinRequest):
         "brain_regions": brain_regions,
         "subvectors": subvectors,
         "timestamp": datetime.utcnow().isoformat(),
-        "reflection_tags": [data.job_title, data.productivity_limiters, data.scent_note]
+        "reflection_tags": [data.job_title, data.productivity_limiters, data.scent_note],
         "xbox_game": xbox_game,
         "game_mode": game_mode,
         "duration_minutes": duration_minutes,
