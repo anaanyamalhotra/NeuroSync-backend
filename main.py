@@ -7,7 +7,7 @@ import json
 import os
 import random
 import requests
-import OpenAI
+import openai
 from generator import generate_twin_vector, infer_gender_from_name, apply_modifiers, extract_keywords
 
 # === INIT ===
