@@ -98,7 +98,7 @@
     "psychological_effects": ["hyperfocus", "explosive energy", "reflex testing"],
     "challenge_level": "very high",
     "duration_range": [30, 60]
-  }
+  },
   {
     "name": "Tetris Effect: Connected",
     "modes": ["Zen", "Multiplayer", "Marathon"],
