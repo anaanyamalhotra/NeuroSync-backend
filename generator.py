@@ -123,6 +123,25 @@ def generate_twin_vector(data: TwinRequest):
         "hypothalamus": (nt["GABA"] + nt["cortisol"]) / 2
     }
 
+    subvectors = {
+        "amygdala": {
+            "emotional_memory": round((nt["oxytocin"] + nt["cortisol"]) / 2, 2),
+            "threat_detection": round(nt["cortisol"], 2)
+        },
+        "prefrontal_cortex": {
+            "planning": round(nt["dopamine"], 2),
+            "focus": round((nt["dopamine"] + nt["serotonin"]) / 2, 2)
+        },
+        "hippocampus": {
+            "memory_encoding": round(nt["serotonin"], 2),
+            "spatial_navigation": round(nt["GABA"], 2)
+        },
+        "hypothalamus": {
+            "stress_response": round((nt["cortisol"] + nt["GABA"]) / 2, 2),
+            "emotional_regulation": round(nt["GABA"], 2)
+        }
+    }
+
     return {
         "name": data.name,
         "age": data.age,
