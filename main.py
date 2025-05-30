@@ -186,11 +186,15 @@ async def generate(data: TwinRequest):
 
         print("== ✅ Twin + Game output ==")
         print(twin)
+        return twin  # ← ADD THIS LINE
+
+    except Exception as e:
+        print("❌ ERROR in /generate:", str(e))
+        return {"error": str(e)}
 
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
@@ -205,6 +209,8 @@ async def reflect(data: ReflectRequest):
             ]
         )
         journal = response["choices"][0]["message"]["content"]
+        print("== ✅ Reflection result ==")
+        print(journal)
         return {"journal_entry": journal}
     
     except Exception as e:
