@@ -186,7 +186,7 @@ async def generate(data: TwinRequest):
 
         print("== ✅ Twin + Game output ==")
         print(twin)
-        return twin  # ← ADD THIS LINE
+        return twin  # <- REQUIRED to return a response
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
@@ -209,10 +209,10 @@ async def reflect(data: ReflectRequest):
             ]
         )
         journal = response["choices"][0]["message"]["content"]
-        print("== ✅ Reflection result ==")
+        print("== ✅ Journal Output ==")
         print(journal)
         return {"journal_entry": journal}
-    
+
     except Exception as e:
         print("❌ ERROR in /reflect:", str(e))
         return {"error": str(e)}
