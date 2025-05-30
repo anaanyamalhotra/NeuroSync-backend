@@ -76,23 +76,38 @@ class ReflectRequest(BaseModel):
 def get_fragrance_notes(scent):
     return fragrance_db.get(scent.lower().strip(), [])
 
-def match_game(favorite_scent, stressors_text):
+def match_game(favorite_scent, stressors_text, neurotransmitters):
     scent = favorite_scent.lower().strip()
     stress_keywords = extract_keywords(stressors_text)
-    candidates = [g for g in game_profiles if scent in g["scent_affinity"]]
 
+    # === Step 1: Filter games that have scent affinity ===
+    candidates = [g for g in game_profiles if scent in g.get("scent_affinity", {})]
     if not candidates:
-        candidates = game_profiles
+        candidates = game_profiles  # fallback to all
 
-    game = random.choice(candidates)
-    rationale = f"Matched based on your preference for '{scent}' and keywords like {', '.join(stress_keywords)}."
+    # === Step 2: Score games based on scent strength and NT alignment ===
+    def score_game(game):
+        scent_score = game["scent_affinity"].get(scent, 0)
+        nt_score = sum(neurotransmitters.get(tag, 0.5) for tag in game.get("tags", [])) / len(game.get("tags", []) or [1])
+        return scent_score * 0.6 + nt_score * 0.4  # Weighted: scent more important
+
+    candidates.sort(key=score_game, reverse=True)
+    best_game = candidates[0]
+
+    # === Step 3: Rationale for match ===
+    dominant_nt = max(neurotransmitters, key=neurotransmitters.get)
+    rationale = (
+        f"Matched with '{best_game['name']}' because its scent affinity with '{scent}' "
+        f"is high and it supports neurotransmitters like {', '.join(best_game['tags'])}. "
+        f"Your current dominant neurotransmitter is {dominant_nt}."
+    )
 
     return {
-        "xbox_game": game["name"],
-        "game_mode": random.choice(game["modes"]),
-        "duration_minutes": random.randint(*game["duration_range"]),
+        "xbox_game": best_game["name"],
+        "game_mode": random.choice(best_game["modes"]),
+        "duration_minutes": random.randint(*best_game["duration_range"]),
         "switch_time": "After 30 mins" if "burnout" in stress_keywords else "After 20 mins",
-        "spotify_playlist": game.get("spotify_playlist", "Focus Boost"),
+        "spotify_playlist": best_game.get("spotify_playlist", "Focus Boost"),
         "match_reason": rationale
     }
 
