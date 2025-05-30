@@ -69,10 +69,10 @@ class ReflectRequest(BaseModel):
     recent_events: str
     goals: str
     neurotransmitters: dict
-    xbox_game: str
-    game_mode: str
-    duration_minutes: int
-    switch_time: str
+    xbox_game: Optional[str] = None
+    game_mode: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    switch_time: Optional[str] = None
 
 # === Helper functions ===
 def get_fragrance_notes(scent):
