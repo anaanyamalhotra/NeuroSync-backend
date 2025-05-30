@@ -1,33 +1,18 @@
-# Main FastAPI app
-
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List, Optional
-import uvicorn
-from generator import generate_twin_vector  # modular logic file
+from generator import generate_twin_vector, TwinRequest
+from gpt_reflection import router as gpt_router
 
 app = FastAPI()
 
-# Define the request model matching frontend payload
-class TwinRequest(BaseModel):
-    name: str
-    age: int
-    gender: str
-    scent_note: str
-    childhood_scent: str
-    stress_keywords: List[str]
-    email: Optional[str] = None
-    job_title: Optional[str] = None
-    company: Optional[str] = None
-    career_goals: Optional[str] = None
-    productivity_limiters: Optional[str] = None
-    routine_description: Optional[str] = None
-    region: Optional[str] = None
+# Root check
+@app.get("/")
+def read_root():
+    return {"message": "NeuroSync Backend is Live!"}
 
+# POST route for twin generation
 @app.post("/generate")
-async def generate(request: TwinRequest):
-    profile = generate_twin_vector(request)
-    return profile
+def generate(data: TwinRequest):
+    return generate_twin_vector(data)
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# GPT reflection router
+app.include_router(gpt_router)
