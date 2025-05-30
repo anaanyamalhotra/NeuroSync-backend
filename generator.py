@@ -3,6 +3,7 @@ from typing import List, Optional, Dict
 import json, os, random
 from datetime import datetime
 import requests
+import difflib
 
 # === Load fragrance notes JSON ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
@@ -60,7 +61,20 @@ def infer_life_stage(job_title: str, goals: str) -> str:
     return "adult"
 
 def get_fragrance_notes(scent: str):
-    return fragrance_db.get(scent.lower().strip(), [])
+    normalized = scent.lower().strip()
+    if normalized in fragrance_db:
+        return fragrance_db[normalized]
+    else:
+        closest = get_closest_scent(normalized)
+        if closest:
+            print(f"[Fallback] Scent '{scent}' not found. Using closest match: '{closest}'")
+            return fragrance_db[closest]
+        return []
+
+def get_closest_scent(input_scent: str):
+    scent_keys = list(fragrance_db.keys())
+    matches = difflib.get_close_matches(input_scent, scent_keys, n=1, cutoff=0.5)
+    return matches[0] if matches else None
 
 def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
     for k, v in modifiers.items():
