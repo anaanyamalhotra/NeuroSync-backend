@@ -215,6 +215,7 @@ async def reflect(data: ReflectRequest):
 
         journal = response.choices[0].message.content.strip()
 
+
         if not journal:
             journal = "🧠 I couldn't generate a reflection right now. Please try again in a bit."
 
