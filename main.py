@@ -7,11 +7,11 @@ import json
 import os
 import random
 import requests
-from openai import OpenAI
+import OpenAI
 from generator import generate_twin_vector, infer_gender_from_name, apply_modifiers, extract_keywords
 
 # === INIT ===
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
 
 app.add_middleware(
@@ -175,7 +175,7 @@ Stay mindful and pace your energy today.
         prompt = build_prompt()
 
         # Call GPT
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
