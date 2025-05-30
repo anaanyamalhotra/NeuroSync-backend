@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Allow CORS (needed for Streamlit to call backend)
+# CORS settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,21 +13,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Define schema
+class ReflectRequest(BaseModel):
+    name: str
+    current_emotion: str
+    recent_events: str
+    goals: str
+
 @app.post("/reflect")
-async def reflect(request: Request):
-    data = await request.json()
-    name = data.get("name")
-    current_emotion = data.get("current_emotion")
-    recent_events = data.get("recent_events")
-    goals = data.get("goals")
-
-    if not all([name, current_emotion, recent_events, goals]):
-        return {"error": "Missing fields."}
-
+async def reflect(data: ReflectRequest):
     journal = (
-        f"Hi {name}, it seems you're feeling {current_emotion.lower()}. "
-        f"Reflecting on recent events — {recent_events} — can help bring clarity. "
-        f"Remember, staying focused on your goals like '{goals}' is a powerful step forward."
+        f"Hi {data.name}, it seems you're feeling {data.current_emotion.lower()}. "
+        f"Reflecting on recent events — {data.recent_events} — can help bring clarity. "
+        f"Remember, staying focused on your goals like '{data.goals}' is a powerful step forward."
     )
-
     return {"journal_entry": journal}
