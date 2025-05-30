@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import Optional
 from datetime import datetime
 import json
 import os
@@ -19,15 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Load fragrance notes ===
+# === Load fragrance notes and game profiles ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
-# === Load game profiles ===
 with open(os.path.join(os.path.dirname(__file__), "game_profiles.json"), "r") as f:
     game_profiles = json.load(f)
 
-# === Scent and stress mappings ===
+# === Mappings ===
 scent_map = {
     "lavender": {"GABA": 0.1},
     "vanilla": {"oxytocin": 0.1},
@@ -48,21 +47,16 @@ stress_map = {
     "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
 }
 
-# === Request schemas ===
+# === Request schemas (7-question model only) ===
 class TwinRequest(BaseModel):
     name: str
-    age: int
-    gender: str
+    email: str
+    job_title: Optional[str]
+    company: Optional[str]
+    career_goals: str
+    productivity_limiters: str
     scent_note: str
     childhood_scent: str
-    stress_keywords: List[str]
-    email: Optional[str] = None
-    job_title: Optional[str] = None
-    company: Optional[str] = None
-    career_goals: Optional[str] = None
-    productivity_limiters: Optional[str] = None
-    routine_description: Optional[str] = None
-    region: Optional[str] = None
 
 class ReflectRequest(BaseModel):
     name: str
@@ -86,6 +80,10 @@ def apply_modifiers(base, modifiers):
     for nt, val in modifiers.items():
         base[nt] = base.get(nt, 0.5) + val
 
+def extract_keywords(text):
+    # very basic keyword matcher for stress map
+    return [k for k in stress_map if k in text.lower()]
+
 def generate_twin_vector(data: TwinRequest):
     nt = {
         "dopamine": 0.5,
@@ -95,17 +93,20 @@ def generate_twin_vector(data: TwinRequest):
         "cortisol": 0.5
     }
 
-    gender = infer_gender_from_name(data.name) or data.gender
+    gender = infer_gender_from_name(data.name)
     if gender == "female":
         nt["oxytocin"] += 0.05
     elif gender == "male":
         nt["dopamine"] += 0.05
 
+    # Apply scent modifiers
     notes = get_fragrance_notes(data.scent_note)
     for note in notes:
         apply_modifiers(nt, scent_map.get(note, {}))
 
-    for keyword in data.stress_keywords:
+    # Extract stress-related keywords and apply effects
+    stress_keywords = extract_keywords(data.productivity_limiters)
+    for keyword in stress_keywords:
         apply_modifiers(nt, stress_map.get(keyword.lower(), {}))
 
     for k in nt:
@@ -139,7 +140,6 @@ def generate_twin_vector(data: TwinRequest):
 
     return {
         "name": data.name,
-        "age": data.age,
         "gender": gender,
         "neurotransmitters": nt,
         "brain_regions": brain_regions,
@@ -147,9 +147,9 @@ def generate_twin_vector(data: TwinRequest):
         "timestamp": datetime.utcnow().isoformat()
     }
 
-def match_game(favorite_scent, stressors):
+def match_game(favorite_scent, stressors_text):
     scent = favorite_scent.lower().strip()
-    stress_keywords = stressors.lower().split(",")
+    stress_keywords = extract_keywords(stressors_text)
     candidates = []
 
     for game in game_profiles:
@@ -173,7 +173,7 @@ def match_game(favorite_scent, stressors):
 @app.post("/generate")
 async def generate(data: TwinRequest):
     twin = generate_twin_vector(data)
-    game = match_game(data.scent_note, ", ".join(data.stress_keywords))
+    game = match_game(data.scent_note, data.productivity_limiters)
     twin.update(game)
     return twin
 
