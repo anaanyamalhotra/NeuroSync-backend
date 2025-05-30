@@ -9,6 +9,7 @@ import random
 import requests
 from openai import OpenAI
 from fastapi import HTTPException
+from generator import generate_twin_vector, infer_gender_from_name
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
