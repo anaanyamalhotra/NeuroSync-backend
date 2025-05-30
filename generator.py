@@ -174,18 +174,19 @@ def generate_twin_vector(data: TwinRequest):
         }
     }
 
-    if nt["dopamine"] > 0.6:
-        spotify_playlist = "Focus Boost"
-    elif nt["serotonin"] < 0.45:
-        spotify_playlist = "Mood Uplift"
-    elif nt["cortisol"] > 0.6:
-        spotify_playlist = "Stress Relief"
-    elif nt["GABA"] < 0.4:
-        spotify_playlist = "Calm Clarity"
-    elif nt["oxytocin"] > 0.6:
-        spotify_playlist = "Connection & Warmth"
+    dominant_nt = max(nt, key=nt.get)
+    if dominant_nt == "dopamine":
+        spotify_playlist = "Upbeat Drive | Motivation Boost"
+    elif dominant_nt == "serotonin":
+        spotify_playlist = "Sunny Mornings | Mood Boosters"
+    elif dominant_nt == "oxytocin":
+        spotify_playlist = "Romantic Acoustics | Cozy Evenings"
+    elif dominant_nt == "GABA":
+        spotify_playlist = "Lofi Chill | Relax & Study"
+    elif dominant_nt == "cortisol" and nt["cortisol"] > 0.6:
+        spotify_playlist = "Calm Nature | Stress Recovery"
     else:
-        spotify_playlist = "Balanced State"
+        spotify_playlist = "Neural Flow | Balanced Focus"
         
     if nt["dopamine"] > 0.6 and nt["cortisol"] < 0.5:
         xbox_game = "Forza Horizon 5"
