@@ -2,72 +2,203 @@
   {
     "name": "Forza Horizon 5",
     "modes": ["Exploration", "Time Trials", "Multiplayer"],
-    "tags": ["dopamine", "norepinephrine", "serotonin"],
-    "scent_affinity": ["citrus", "mint", "bergamot"],
+    "tags": ["dopamine", "serotonin", "GABA"],
+    "scent_affinity": {"mint": 0.5, "citrus": 0.3, "bergamot": 0.2},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus"],
+    "psychological_effects": ["flow", "excitement", "mild stress release"],
+    "challenge_level": "moderate",
     "duration_range": [30, 45]
   },
   {
     "name": "Stardew Valley",
     "modes": ["Relaxed", "Farming", "Social"],
     "tags": ["oxytocin", "GABA", "serotonin"],
-    "scent_affinity": ["vanilla", "lavender", "rose"],
+    "scent_affinity": {"vanilla": 0.4, "lavender": 0.35, "rose": 0.25},
+    "brain_region_activation": ["amygdala", "hypothalamus"],
+    "psychological_effects": ["calm", "emotional bonding", "routine reinforcement"],
+    "challenge_level": "low",
     "duration_range": [20, 30]
   },
   {
     "name": "Halo Infinite",
     "modes": ["Campaign", "Multiplayer", "Arena"],
-    "tags": ["cortisol", "dopamine", "norepinephrine"],
-    "scent_affinity": ["mint", "cinnamon"],
+    "tags": ["cortisol", "dopamine", "GABA"],
+    "scent_affinity": {"mint": 0.6, "cinnamon": 0.4},
+    "brain_region_activation": ["amygdala", "prefrontal_cortex"],
+    "psychological_effects": ["alertness", "adrenaline rush", "strategic focus"],
+    "challenge_level": "high",
     "duration_range": [30, 60]
   },
   {
     "name": "Celeste",
     "modes": ["Story", "Challenge", "Speedrun"],
-    "tags": ["dopamine", "GABA", "serotonin"],
-    "scent_affinity": ["lavender", "citrus", "rose"],
+    "tags": ["serotonin", "dopamine", "GABA", "cortisol"],
+    "scent_affinity": {"lavender": 0.35, "citrus": 0.4, "rose": 0.25},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus", "amygdala"],
+    "psychological_effects": ["resilience", "emotional regulation", "growth mindset"],
+    "challenge_level": "very high",
     "duration_range": [25, 40]
   },
   {
     "name": "The Witcher 3: Wild Hunt",
     "modes": ["Story", "Exploration", "Combat"],
     "tags": ["dopamine", "cortisol", "serotonin", "oxytocin"],
-    "scent_affinity": ["cinnamon", "tonka bean", "mint"],
+    "scent_affinity": {"cinnamon": 0.4, "tonka bean": 0.35, "mint": 0.25},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus", "amygdala"],
+    "psychological_effects": ["immersion", "moral tension", "cognitive empathy"],
+    "challenge_level": "high",
     "duration_range": [45, 90]
   },
   {
     "name": "Minecraft",
     "modes": ["Creative", "Survival", "Adventure"],
-    "tags": ["dopamine", "oxytocin", "serotonin"],
-    "scent_affinity": ["vanilla", "bergamot", "mint"],
+    "tags": ["dopamine", "oxytocin", "serotonin", "GABA"],
+    "scent_affinity": {"vanilla": 0.3, "bergamot": 0.35, "mint": 0.35},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus"],
+    "psychological_effects": ["creativity", "relaxation", "goal-setting"],
+    "challenge_level": "variable",
     "duration_range": [30, 60]
   },
   {
     "name": "Ori and the Will of the Wisps",
     "modes": ["Exploration", "Story", "Challenge"],
-    "tags": ["serotonin", "oxytocin", "dopamine"],
-    "scent_affinity": ["rose", "vanilla", "lavender"],
+    "tags": ["serotonin", "oxytocin", "GABA"],
+    "scent_affinity": {"rose": 0.35, "vanilla": 0.35, "lavender": 0.3},
+    "brain_region_activation": ["hippocampus", "amygdala"],
+    "psychological_effects": ["awe", "narrative empathy", "calming flow"],
+    "challenge_level": "moderate",
     "duration_range": [30, 50]
   },
   {
     "name": "Dead by Daylight",
     "modes": ["Survivor", "Killer", "Multiplayer"],
     "tags": ["cortisol", "GABA", "dopamine"],
-    "scent_affinity": ["bergamot", "lavender", "mint"],
+    "scent_affinity": {"bergamot": 0.4, "lavender": 0.3, "mint": 0.3},
+    "brain_region_activation": ["amygdala", "hypothalamus"],
+    "psychological_effects": ["survival stress", "dopaminergic spikes", "team strategy"],
+    "challenge_level": "high",
     "duration_range": [20, 40]
   },
   {
     "name": "Slime Rancher 2",
     "modes": ["Adventure", "Relaxed", "Exploration"],
-    "tags": ["oxytocin", "serotonin", "GABA"],
-    "scent_affinity": ["citrus", "vanilla", "rose"],
+    "tags": ["oxytocin", "serotonin", "dopamine"],
+    "scent_affinity": {"citrus": 0.35, "vanilla": 0.4, "rose": 0.25},
+    "brain_region_activation": ["hippocampus", "amygdala"],
+    "psychological_effects": ["whimsy", "joy", "routine stress relief"],
+    "challenge_level": "low",
     "duration_range": [25, 35]
   },
   {
     "name": "DOOM Eternal",
     "modes": ["Campaign", "Arcade", "Multiplayer"],
-    "tags": ["dopamine", "cortisol", "norepinephrine"],
-    "scent_affinity": ["cinnamon", "mint"],
+    "tags": ["dopamine", "cortisol", "adrenaline"],
+    "scent_affinity": {"cinnamon": 0.5, "mint": 0.5},
+    "brain_region_activation": ["amygdala", "prefrontal_cortex"],
+    "psychological_effects": ["hyperfocus", "explosive energy", "reflex testing"],
+    "challenge_level": "very high",
     "duration_range": [30, 60]
   }
+  {
+    "name": "Tetris Effect: Connected",
+    "modes": ["Zen", "Multiplayer", "Marathon"],
+    "tags": ["GABA", "serotonin", "dopamine"],
+    "scent_affinity": {"lavender": 0.4, "mint": 0.3, "bergamot": 0.3},
+    "brain_region_activation": ["hippocampus", "prefrontal_cortex"],
+    "psychological_effects": ["flow", "meditative focus", "visual relaxation"],
+    "challenge_level": "moderate",
+    "duration_range": [20, 40]
+  },
+  {
+    "name": "Hellblade: Senua's Sacrifice",
+    "modes": ["Narrative", "Puzzle", "Combat"],
+    "tags": ["cortisol", "oxytocin", "dopamine"],
+    "scent_affinity": {"rose": 0.3, "tonka bean": 0.4, "lavender": 0.3},
+    "brain_region_activation": ["amygdala", "hippocampus"],
+    "psychological_effects": ["trauma processing", "narrative immersion", "empathy"],
+    "challenge_level": "high",
+    "duration_range": [40, 60]
+  },
+  {
+    "name": "Inside",
+    "modes": ["Puzzle", "Platformer", "Story"],
+    "tags": ["GABA", "cortisol", "serotonin"],
+    "scent_affinity": {"bergamot": 0.4, "citrus": 0.3, "mint": 0.3},
+    "brain_region_activation": ["amygdala", "prefrontal_cortex"],
+    "psychological_effects": ["tension", "silent storytelling", "strategic thinking"],
+    "challenge_level": "moderate",
+    "duration_range": [30, 45]
+  },
+  {
+    "name": "Sea of Thieves",
+    "modes": ["Exploration", "Multiplayer", "Adventure"],
+    "tags": ["dopamine", "oxytocin", "serotonin"],
+    "scent_affinity": {"mint": 0.4, "vanilla": 0.3, "citrus": 0.3},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus"],
+    "psychological_effects": ["collaboration", "goal setting", "mild challenge"],
+    "challenge_level": "moderate",
+    "duration_range": [45, 60]
+  },
+  {
+    "name": "Microsoft Flight Simulator",
+    "modes": ["Exploration", "Simulation", "Training"],
+    "tags": ["GABA", "serotonin", "dopamine"],
+    "scent_affinity": {"lavender": 0.4, "citrus": 0.3, "bergamot": 0.3},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus"],
+    "psychological_effects": ["visual focus", "spatial awareness", "relaxation"],
+    "challenge_level": "moderate",
+    "duration_range": [45, 90]
+  },
+  {
+    "name": "Hollow Knight",
+    "modes": ["Exploration", "Combat", "Story"],
+    "tags": ["dopamine", "cortisol", "GABA"],
+    "scent_affinity": {"cinnamon": 0.4, "mint": 0.3, "rose": 0.3},
+    "brain_region_activation": ["amygdala", "prefrontal_cortex"],
+    "psychological_effects": ["persistence", "challenge endurance", "emotional narrative"],
+    "challenge_level": "very high",
+    "duration_range": [40, 60]
+  },
+  {
+    "name": "Journey to the Savage Planet",
+    "modes": ["Adventure", "Exploration", "Co-op"],
+    "tags": ["serotonin", "dopamine", "oxytocin"],
+    "scent_affinity": {"citrus": 0.4, "vanilla": 0.3, "mint": 0.3},
+    "brain_region_activation": ["hippocampus", "prefrontal_cortex"],
+    "psychological_effects": ["humor", "curiosity", "collaborative joy"],
+    "challenge_level": "moderate",
+    "duration_range": [35, 50]
+  },
+  {
+    "name": "The Artful Escape",
+    "modes": ["Story", "Platformer", "Rhythm"],
+    "tags": ["dopamine", "oxytocin", "serotonin"],
+    "scent_affinity": {"rose": 0.4, "vanilla": 0.3, "bergamot": 0.3},
+    "brain_region_activation": ["prefrontal_cortex", "hippocampus"],
+    "psychological_effects": ["identity exploration", "musical immersion", "visual awe"],
+    "challenge_level": "low",
+    "duration_range": [30, 45]
+  },
+  {
+    "name": "It Takes Two",
+    "modes": ["Puzzle", "Co-op", "Narrative"],
+    "tags": ["oxytocin", "serotonin", "dopamine"],
+    "scent_affinity": {"vanilla": 0.35, "rose": 0.35, "lavender": 0.3},
+    "brain_region_activation": ["amygdala", "hippocampus"],
+    "psychological_effects": ["emotional bonding", "teamwork", "conflict resolution"],
+    "challenge_level": "moderate",
+    "duration_range": [45, 60]
+  },
+  {
+    "name": "Sable",
+    "modes": ["Exploration", "Narrative", "Puzzle"],
+    "tags": ["serotonin", "GABA", "dopamine"],
+    "scent_affinity": {"lavender": 0.35, "mint": 0.35, "bergamot": 0.3},
+    "brain_region_activation": ["hippocampus", "prefrontal_cortex"],
+    "psychological_effects": ["serenity", "visual curiosity", "calming autonomy"],
+    "challenge_level": "low",
+    "duration_range": [30, 50]
+  }
 ]
+
 
