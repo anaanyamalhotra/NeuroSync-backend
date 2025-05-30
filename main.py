@@ -172,16 +172,18 @@ def match_game(favorite_scent, stressors_text):
 # === API Routes ===
 @app.post("/generate")
 async def generate(data: TwinRequest):
-    twin = generate_twin_vector(data)
-    game = match_game(data.scent_note, data.productivity_limiters)
-    twin.update(game)
-    return twin
+    try:
+        print("== ✅ Incoming request to /generate ==")
+        print(data)
 
-@app.post("/reflect")
-async def reflect(data: ReflectRequest):
-    journal = (
-        f"Hi {data.name}, it seems you're feeling {data.current_emotion.lower()}. "
-        f"Reflecting on recent events — {data.recent_events} — can help bring clarity. "
-        f"Remember, staying focused on your goals like '{data.goals}' is a powerful step forward."
-    )
-    return {"journal_entry": journal}
+        twin = generate_twin_vector(data)
+        game = match_game(data.scent_note, data.productivity_limiters)
+        twin.update(game)
+
+        print("== ✅ Twin + Game output ==")
+        print(twin)
+
+        return twin
+    except Exception as e:
+        print("❌ ERROR in /generate:", str(e))
+        return {"error": str(e)}
