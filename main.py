@@ -199,26 +199,51 @@ async def reflect(data: ReflectRequest):
         print("== Incoming Reflect Request ==")
         print(data)
 
+        def analyze_neuro(nt):
+            suggestions = []
+            if nt.get("dopamine", 0.5) < 0.4:
+                suggestions.append("Your dopamine is a bit low — short-term goal wins and energizing scents like mint or cinnamon may help.")
+            if nt.get("serotonin", 0.5) < 0.4:
+                suggestions.append("Serotonin levels suggest a mood dip. Try citrus scents, outdoor light, or gratitude journaling.")
+            if nt.get("oxytocin", 0.5) < 0.4:
+                suggestions.append("Feeling socially drained? Vanilla or rose scents and warm conversation can lift oxytocin.")
+            if nt.get("GABA", 0.5) < 0.4:
+                suggestions.append("Low GABA may cause overwhelm. Lavender, linalool or quiet focus time can restore calm.")
+            if nt.get("cortisol", 0.5) > 0.7:
+                suggestions.append("Your stress (cortisol) is high — take breaks, avoid multitasking, and try bergamot scent or breathing exercises.")
+            return suggestions
+
+        def build_prompt():
+            insights = analyze_neuro(data.neurotransmitters or {})
+            joined_insights = "\n".join(insights)
+            game_reco = f"Today’s game: {data.xbox_game} ({data.game_mode}), play for ~{data.duration_minutes} minutes, then switch: {data.switch_time}."
+            return (
+                f"My name is {data.name}. I feel {data.current_emotion}. "
+                f"Recent events include: {data.recent_events}. My goals are: {data.goals}. "
+                f"Based on my brain chemistry, here's what's going on: {joined_insights}. "
+                f"{game_reco} Suggest a daily routine, calming scent and a Spotify playlist to help."
+            )
+
+        prompt = build_prompt()
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a gentle, motivational journal assistant who helps users process emotions through reflection."
+                    "content": (
+                        "You're a motivational mental wellness coach who interprets emotional state, brain chemistry, "
+                        "and gaming focus to offer an uplifting reflection with practical guidance. Keep it kind, clear, and actionable."
+                    )
                 },
                 {
                     "role": "user",
-                    "content": f"My name is {data.name}. I feel {data.current_emotion}. Recent events include: {data.recent_events}. My goals are: {data.goals}."
+                    "content": prompt
                 }
             ]
         )
 
         journal = response.choices[0].message.content.strip()
-
-
-        if not journal:
-            journal = "🧠 I couldn't generate a reflection right now. Please try again in a bit."
-
         return {"journal_entry": journal}
 
     except Exception as e:
