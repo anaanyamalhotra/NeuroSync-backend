@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -8,14 +8,12 @@ import os
 import random
 import requests
 from openai import OpenAI
-from fastapi import HTTPException
-from generator import generate_twin_vector, infer_gender_from_name
+from generator import generate_twin_vector, infer_gender_from_name, apply_modifiers, extract_keywords
 
+# === INIT ===
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 app = FastAPI()
 
-# === CORS settings ===
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,15 +22,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Load fragrance notes and game profiles ===
+# === Load static data ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
 with open(os.path.join(os.path.dirname(__file__), "game_profiles.json"), "r") as f:
     game_profiles = json.load(f)
 
-
-# === Mappings ===
+# === Scent + Stress Maps ===
 scent_map = {
     "lavender": {"GABA": 0.1},
     "vanilla": {"oxytocin": 0.1},
@@ -53,7 +50,7 @@ stress_map = {
     "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
 }
 
-# === Request schemas (7-question model only) ===
+# === Data models ===
 class TwinRequest(BaseModel):
     name: str
     email: str
@@ -75,126 +72,41 @@ class ReflectRequest(BaseModel):
     duration_minutes: Optional[int] = None
     switch_time: Optional[str] = None
 
-# === Helper functions ===
+# === Utility ===
 def get_fragrance_notes(scent):
     return fragrance_db.get(scent.lower().strip(), [])
-
-def infer_gender_from_name(name):
-    try:
-        res = requests.get(f"https://api.genderize.io?name={name.split()[0]}")
-        if res.status_code == 200:
-            return res.json().get("gender")
-    except:
-        return None
-
-def apply_modifiers(base, modifiers):
-    for nt, val in modifiers.items():
-        base[nt] = base.get(nt, 0.5) + val
-
-def extract_keywords(text):
-    # very basic keyword matcher for stress map
-    return [k for k in stress_map if k in text.lower()]
-
-def generate_twin_vector(data: TwinRequest):
-    nt = {
-        "dopamine": 0.5,
-        "serotonin": 0.5,
-        "oxytocin": 0.5,
-        "GABA": 0.5,
-        "cortisol": 0.5
-    }
-
-    gender = infer_gender_from_name(data.name)
-    if gender == "female":
-        nt["oxytocin"] += 0.05
-    elif gender == "male":
-        nt["dopamine"] += 0.05
-
-    # Apply scent modifiers
-    notes = get_fragrance_notes(data.scent_note)
-    for note in notes:
-        apply_modifiers(nt, scent_map.get(note, {}))
-
-    # Extract stress-related keywords and apply effects
-    stress_keywords = extract_keywords(data.productivity_limiters)
-    for keyword in stress_keywords:
-        apply_modifiers(nt, stress_map.get(keyword.lower(), {}))
-
-    for k in nt:
-        nt[k] = max(0, min(1, nt[k]))
-
-    brain_regions = {
-        "amygdala": (nt["cortisol"] + nt["oxytocin"]) / 2,
-        "prefrontal_cortex": (nt["dopamine"] + nt["serotonin"]) / 2,
-        "hippocampus": (nt["serotonin"] + nt["GABA"]) / 2,
-        "hypothalamus": (nt["GABA"] + nt["cortisol"]) / 2
-    }
-
-    subvectors = {
-        "amygdala": {
-            "emotional_memory": round((nt["oxytocin"] + nt["cortisol"]) / 2, 2),
-            "threat_detection": round(nt["cortisol"], 2)
-        },
-        "prefrontal_cortex": {
-            "planning": round(nt["dopamine"], 2),
-            "focus": round((nt["dopamine"] + nt["serotonin"]) / 2, 2)
-        },
-        "hippocampus": {
-            "memory_encoding": round(nt["serotonin"], 2),
-            "spatial_navigation": round(nt["GABA"], 2)
-        },
-        "hypothalamus": {
-            "stress_response": round((nt["cortisol"] + nt["GABA"]) / 2, 2),
-            "emotional_regulation": round(nt["GABA"], 2)
-        }
-    }
-
-    return {
-        "name": data.name,
-        "gender": gender,
-        "neurotransmitters": nt,
-        "brain_regions": brain_regions,
-        "subvectors": subvectors,
-        "timestamp": datetime.utcnow().isoformat()
-    }
 
 def match_game(favorite_scent, stressors_text):
     scent = favorite_scent.lower().strip()
     stress_keywords = extract_keywords(stressors_text)
-    candidates = []
-
-    for game in game_profiles:
-        if scent in game["scent_affinity"]:
-            candidates.append(game)
+    candidates = [g for g in game_profiles if scent in g["scent_affinity"]]
 
     if not candidates:
         candidates = game_profiles
 
     game = random.choice(candidates)
+    rationale = f"Matched based on your preference for '{scent}' and keywords like {', '.join(stress_keywords)}."
 
     return {
         "xbox_game": game["name"],
         "game_mode": random.choice(game["modes"]),
         "duration_minutes": random.randint(*game["duration_range"]),
-        "switch_time": "After 30 minutes" if "burnout" in stress_keywords else "After 20 minutes",
-        "spotify_playlist": game.get("spotify_playlist", "Focus Boost")
+        "switch_time": "After 30 mins" if "burnout" in stress_keywords else "After 20 mins",
+        "spotify_playlist": game.get("spotify_playlist", "Focus Boost"),
+        "match_reason": rationale
     }
 
-# === API Routes ===
+# === API ROUTES ===
 @app.post("/generate")
 async def generate(data: TwinRequest):
     try:
-        print("== ✅ Incoming request to /generate ==")
-        print(data)
-
+        print("== ✅ Request received at /generate ==")
         twin = generate_twin_vector(data)
-        game = match_game(data.scent_note, data.productivity_limiters or "")
+        game = match_game(data.scent_note, data.productivity_limiters)
         twin.update(game)
-
-        print("== ✅ Twin + Game output ==")
-        print(twin)
+        twin["timestamp"] = datetime.utcnow().isoformat()
+        print("== ✅ Final Output ==")
         return twin
-
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
         return {"error": str(e)}
@@ -202,57 +114,44 @@ async def generate(data: TwinRequest):
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
-        print("== Incoming Reflect Request ==")
-        print(data)
+        print("== 🧠 Reflect request in ==")
 
         def analyze_neuro(nt):
             suggestions = []
             if nt.get("dopamine", 0.5) < 0.4:
-                suggestions.append("Your dopamine is a bit low — short-term goal wins and energizing scents like mint or cinnamon may help.")
+                suggestions.append("Dopamine dip detected — aim for quick wins and minty scents.")
             if nt.get("serotonin", 0.5) < 0.4:
-                suggestions.append("Serotonin levels suggest a mood dip. Try citrus scents, outdoor light, or gratitude journaling.")
+                suggestions.append("Mood might be low. Try citrus exposure or daylight.")
             if nt.get("oxytocin", 0.5) < 0.4:
-                suggestions.append("Feeling socially drained? Vanilla or rose scents and warm conversation can lift oxytocin.")
+                suggestions.append("Oxytocin is low. You may benefit from warm scents or chats with a friend.")
             if nt.get("GABA", 0.5) < 0.4:
-                suggestions.append("Low GABA may cause overwhelm. Lavender, linalool or quiet focus time can restore calm.")
+                suggestions.append("GABA is down — lavender or calm-focused gaming helps.")
             if nt.get("cortisol", 0.5) > 0.7:
-                suggestions.append("Your stress (cortisol) is high — take breaks, avoid multitasking, and try bergamot scent or breathing exercises.")
+                suggestions.append("Cortisol is high. Deep breaths. Bergamot. Distraction helps.")
             return suggestions
 
         def build_prompt():
             insights = analyze_neuro(data.neurotransmitters or {})
-            joined_insights = "\n".join(insights)
-            game_reco = f"Today’s game: {data.xbox_game} ({data.game_mode}), play for ~{data.duration_minutes} minutes, then switch: {data.switch_time}."
-            playlist = f"We’ve also curated a Spotify playlist for today: {data.name}'s {data.game_mode} Vibes 🎶"
-            return (
-                f"My name is {data.name}. I feel {data.current_emotion}. "
-                f"Recent events include: {data.recent_events}. My goals are: {data.goals}. "
-                f"Based on my brain chemistry, here's what's going on: {joined_insights}. "
-                f"{game_reco} Suggest a daily routine, calming scent and a Spotify playlist to help."
+            prompt = (
+                f"My name is {data.name}. I'm feeling {data.current_emotion}. "
+                f"Today, {data.recent_events}. My goals: {data.goals}. "
+                f"Neurochemically: {', '.join(insights)} "
+                f"Game: {data.xbox_game} in {data.game_mode} mode, ~{data.duration_minutes} minutes. "
+                f"Switch after: {data.switch_time}. "
+                f"Suggest a scent, mood tactic, and playlist."
             )
-
-        prompt = build_prompt()
+            return prompt
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You're a motivational mental wellness coach who interprets emotional state, brain chemistry, "
-                        "and gaming focus to offer an uplifting reflection with practical guidance. Keep it kind, clear, and actionable."
-                    )
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
+                {"role": "system", "content": "You are a friendly mental wellness coach who connects scent, emotion, and game data to suggest personalized, motivational reflections."},
+                {"role": "user", "content": build_prompt()}
             ]
         )
-
         journal = response.choices[0].message.content.strip()
         return {"journal_entry": journal}
-
     except Exception as e:
         print("❌ ERROR in /reflect:", str(e))
         return {"journal_entry": f"🧠 Error: {str(e)}"}
+
