@@ -148,5 +148,6 @@ def generate_twin_vector(data: TwinRequest):
         "gender": gender,
         "neurotransmitters": nt,
         "brain_regions": brain_regions,
+        "subvectors": subvectors,
         "timestamp": datetime.utcnow().isoformat()
     }
