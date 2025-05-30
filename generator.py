@@ -85,6 +85,13 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
     for k, v in modifiers.items():
         base[k] = base.get(k, 0.5) + v
 
+from textblob import TextBlob
+
+def extract_keywords(text: str) -> List[str]:
+    """Extracts noun-based keywords from input text using TextBlob POS tagging."""
+    blob = TextBlob(text)
+    return [word for word, tag in blob.tags if tag.startswith("NN")]
+
 # === Journal Logging ===
 def log_journal_entry(data: TwinRequest, output: dict):
     log_dir = "journal_logs"
