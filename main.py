@@ -194,8 +194,15 @@ async def generate(data: TwinRequest):
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
+        print("== Incoming Reflect Request ==")
+        print(data)
+
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        if not openai.api_key:
+            raise Exception("❌ OPENAI_API_KEY is missing")
+
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # fallback to 3.5 if GPT-4 is flaky
+            model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
@@ -207,16 +214,16 @@ async def reflect(data: ReflectRequest):
                 }
             ]
         )
+
+        print("== ✅ OpenAI Response ==")
+        print(response)
+
         journal = response["choices"][0]["message"]["content"].strip()
-
         if not journal:
-            journal = "Sorry, I couldn't generate a reflection at this time. Please try again later."
-
-        print("== ✅ Journal Output ==")
-        print(journal)
+            journal = "🧠 I couldn't generate a reflection right now. Please try again in a bit."
 
         return {"journal_entry": journal}
 
     except Exception as e:
         print("❌ ERROR in /reflect:", str(e))
-        return {"error": str(e)}
+        return {"journal_entry": f"🧠 Error: {str(e)}"}
