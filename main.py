@@ -10,6 +10,9 @@ import requests
 import openai
 from fastapi import HTTPException
 
+from openai import OpenAI
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 app = FastAPI()
 
 # === CORS settings ===
@@ -197,11 +200,7 @@ async def reflect(data: ReflectRequest):
         print("== Incoming Reflect Request ==")
         print(data)
 
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        if not openai.api_key:
-            raise Exception("❌ OPENAI_API_KEY is missing")
-
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -215,10 +214,8 @@ async def reflect(data: ReflectRequest):
             ]
         )
 
-        print("== ✅ OpenAI Response ==")
-        print(response)
+        journal = response.choices[0].message.content.strip()
 
-        journal = response["choices"][0]["message"]["content"].strip()
         if not journal:
             journal = "🧠 I couldn't generate a reflection right now. Please try again in a bit."
 
