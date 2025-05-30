@@ -95,6 +95,18 @@ def generate_twin_vector(data: TwinRequest):
         "cortisol": 0.5
     }
 
+def infer_life_stage(job_title: str, career_goals: str) -> str:
+    text = f"{job_title} {career_goals}".lower()
+
+    if any(term in text for term in ["intern", "student", "graduate", "entry level"]):
+        return "young_adult"
+    elif any(term in text for term in ["manager", "executive", "founder", "startup", "mid-career", "promotion"]):
+        return "adult"
+    elif any(term in text for term in ["retired", "veteran", "consultant", "legacy"]):
+        return "senior"
+    else:
+        return "adult"
+
     # Inferred gender tweak
     gender = infer_gender_from_name(data.name) or data.gender
     if gender == "female":
