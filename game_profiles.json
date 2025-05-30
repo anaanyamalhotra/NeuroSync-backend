@@ -1,0 +1,213 @@
+[
+    {
+        "name": "Forza Horizon 5",
+        "modes": [
+            "Exploration",
+            "Time Trials",
+            "Multiplayer"
+        ],
+        "tags": [
+            "dopamine",
+            "serotonin"
+        ],
+        "scent_affinity": [
+            "mint",
+            "citrus",
+            "bergamot"
+        ],
+        "duration_range": [
+            30,
+            45
+        ]
+    },
+    {
+        "name": "Stardew Valley",
+        "modes": [
+            "Relaxed",
+            "Farming",
+            "Social"
+        ],
+        "tags": [
+            "oxytocin",
+            "GABA"
+        ],
+        "scent_affinity": [
+            "vanilla",
+            "lavender",
+            "rose"
+        ],
+        "duration_range": [
+            20,
+            30
+        ]
+    },
+    {
+        "name": "Halo Infinite",
+        "modes": [
+            "Campaign",
+            "Multiplayer",
+            "Arena"
+        ],
+        "tags": [
+            "cortisol",
+            "dopamine"
+        ],
+        "scent_affinity": [
+            "mint",
+            "cinnamon"
+        ],
+        "duration_range": [
+            30,
+            60
+        ]
+    },
+    {
+        "name": "Celeste",
+        "modes": [
+            "Story",
+            "Challenge",
+            "Speedrun"
+        ],
+        "tags": [
+            "serotonin",
+            "dopamine",
+            "GABA"
+        ],
+        "scent_affinity": [
+            "lavender",
+            "citrus",
+            "rose"
+        ],
+        "duration_range": [
+            25,
+            40
+        ]
+    },
+    {
+        "name": "The Witcher 3: Wild Hunt",
+        "modes": [
+            "Story",
+            "Exploration",
+            "Combat"
+        ],
+        "tags": [
+            "dopamine",
+            "cortisol",
+            "serotonin"
+        ],
+        "scent_affinity": [
+            "cinnamon",
+            "tonka bean",
+            "mint"
+        ],
+        "duration_range": [
+            45,
+            90
+        ]
+    },
+    {
+        "name": "Minecraft",
+        "modes": [
+            "Creative",
+            "Survival",
+            "Adventure"
+        ],
+        "tags": [
+            "dopamine",
+            "oxytocin",
+            "serotonin"
+        ],
+        "scent_affinity": [
+            "vanilla",
+            "bergamot",
+            "mint"
+        ],
+        "duration_range": [
+            30,
+            60
+        ]
+    },
+    {
+        "name": "Ori and the Will of the Wisps",
+        "modes": [
+            "Exploration",
+            "Story",
+            "Challenge"
+        ],
+        "tags": [
+            "serotonin",
+            "oxytocin"
+        ],
+        "scent_affinity": [
+            "rose",
+            "vanilla",
+            "lavender"
+        ],
+        "duration_range": [
+            30,
+            50
+        ]
+    },
+    {
+        "name": "Dead by Daylight",
+        "modes": [
+            "Survivor",
+            "Killer",
+            "Multiplayer"
+        ],
+        "tags": [
+            "cortisol",
+            "GABA"
+        ],
+        "scent_affinity": [
+            "bergamot",
+            "lavender",
+            "mint"
+        ],
+        "duration_range": [
+            20,
+            40
+        ]
+    },
+    {
+        "name": "Slime Rancher 2",
+        "modes": [
+            "Adventure",
+            "Relaxed",
+            "Exploration"
+        ],
+        "tags": [
+            "oxytocin",
+            "serotonin"
+        ],
+        "scent_affinity": [
+            "citrus",
+            "vanilla",
+            "rose"
+        ],
+        "duration_range": [
+            25,
+            35
+        ]
+    },
+    {
+        "name": "DOOM Eternal",
+        "modes": [
+            "Campaign",
+            "Arcade",
+            "Multiplayer"
+        ],
+        "tags": [
+            "dopamine",
+            "cortisol"
+        ],
+        "scent_affinity": [
+            "cinnamon",
+            "mint"
+        ],
+        "duration_range": [
+            30,
+            60
+        ]
+    }
+]
