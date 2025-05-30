@@ -195,7 +195,7 @@ async def generate(data: TwinRequest):
 async def reflect(data: ReflectRequest):
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",  # fallback to 3.5 if GPT-4 is flaky
             messages=[
                 {
                     "role": "system",
@@ -207,9 +207,14 @@ async def reflect(data: ReflectRequest):
                 }
             ]
         )
-        journal = response["choices"][0]["message"]["content"]
+        journal = response["choices"][0]["message"]["content"].strip()
+
+        if not journal:
+            journal = "Sorry, I couldn't generate a reflection at this time. Please try again later."
+
         print("== ✅ Journal Output ==")
         print(journal)
+
         return {"journal_entry": journal}
 
     except Exception as e:
