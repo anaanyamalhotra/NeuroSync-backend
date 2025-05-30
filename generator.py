@@ -1,19 +1,14 @@
 from pydantic import BaseModel
 from typing import List, Optional, Dict
-import re
-import json
-import os
+import json, os, random
 from datetime import datetime
 import requests
-from textblob import TextBlob
-import tldextract
-import psycopg2
 
 # === Load fragrance notes JSON ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
-# === Mapping Tables ===
+# === Scent and Stress Maps ===
 scent_map = {
     "lavender": {"GABA": 0.1},
     "vanilla": {"oxytocin": 0.1},
@@ -34,159 +29,123 @@ stress_map = {
     "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
 }
 
+# === Input Model (Packet-Based) ===
 class TwinRequest(BaseModel):
     name: str
-    age: int
-    gender: str
+    email: str
+    job_title: str
+    company: str
+    career_goals: str
+    productivity_limiters: str
     scent_note: str
     childhood_scent: str
-    stress_keywords: List[str]
-    email: Optional[str] = None
-    job_title: Optional[str] = None
-    company: Optional[str] = None
-    career_goals: Optional[str] = None
-    productivity_limiters: Optional[str] = None
-    routine_description: Optional[str] = None
-    region: Optional[str] = None
-
-# === Scent + Stress Effects ===
-scent_map = {
-    "lavender": {"GABA": 0.1},
-    "vanilla": {"oxytocin": 0.1},
-    "mint": {"dopamine": 0.1},
-    "citrus": {"serotonin": 0.1},
-    "rose": {"oxytocin": 0.1},
-    "bergamot": {"serotonin": 0.1},
-    "cinnamon": {"dopamine": 0.1},
-    "tonka bean": {"oxytocin": 0.1},
-    "linalool": {"GABA": 0.1}
-}
-
-stress_map = {
-    "deadline": {"cortisol": 0.2, "GABA": -0.1},
-    "burnout": {"cortisol": 0.3, "dopamine": -0.1},
-    "lonely": {"oxytocin": -0.2},
-    "exam": {"cortisol": 0.2, "dopamine": 0.05},
-    "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
-}
 
 # === Helper Functions ===
-def get_fragrance_notes(scent):
-    return fragrance_db.get(scent.lower().strip(), [])
-
-def infer_gender_from_name(name):
+def infer_gender(name):
     try:
         res = requests.get(f"https://api.genderize.io?name={name.split()[0]}")
         if res.status_code == 200:
-            return res.json().get("gender")
+            return res.json().get("gender", "neutral")
     except:
-        return None
+        return "neutral"
 
-def apply_modifiers(base, modifiers):
-    for nt, val in modifiers.items():
-        base[nt] = base.get(nt, 0.5) + val
-
-def infer_life_stage(job_title: str, career_goals: str) -> str:
-    text = f"{job_title} {career_goals}".lower()
-
-    if any(term in text for term in ["intern", "student", "graduate", "entry level"]):
+def infer_life_stage(job_title: str, goals: str) -> str:
+    text = f"{job_title} {goals}".lower()
+    if any(k in text for k in ["student", "intern", "trainee"]):
         return "young_adult"
-    elif any(term in text for term in ["manager", "executive", "founder", "startup", "mid-career", "promotion"]):
+    elif any(k in text for k in ["manager", "executive", "founder"]):
         return "adult"
-    elif any(term in text for term in ["retired", "veteran", "consultant", "legacy"]):
+    elif "retired" in text:
         return "senior"
-    else:
-        return "adult"
+    return "adult"
 
-def log_journal_entry(data: TwinRequest, vector_output: dict):
+def get_fragrance_notes(scent: str):
+    return fragrance_db.get(scent.lower().strip(), [])
+
+def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
+    for k, v in modifiers.items():
+        base[k] = base.get(k, 0.5) + v
+
+# === Journal Logging ===
+def log_journal_entry(data: TwinRequest, output: dict):
     log_dir = "journal_logs"
     os.makedirs(log_dir, exist_ok=True)
-    filename = data.email.replace("@", "_at_") + ".txt" if data.email else "anonymous_log.txt"
-    log_path = os.path.join(log_dir, filename)
-
-    entry = f"""
-Timestamp: {vector_output['timestamp']}
+    filename = data.email.replace("@", "_at_") + ".txt"
+    with open(os.path.join(log_dir, filename), "a") as f:
+        f.write(f"""
+Timestamp: {output['timestamp']}
 Name: {data.name}
-Age: {data.age}
-Gender: {vector_output['gender']}
-Neurotransmitters: {vector_output['neurotransmitters']}
-Game: {vector_output.get("xbox_game", "N/A")}
-Playlist: {vector_output.get("spotify_playlist", "N/A")}
-Reflection: generated from Twin vector
-----------------------------
-"""
-    with open(log_path, "a") as f:
-        f.write(entry)
+Gender: {output['gender']}
+Life Stage: {output['life_stage']}
+Neurotransmitters: {output['neurotransmitters']}
+Reflection Tags: {output.get('reflection_tags', [])}
+Suggested Game: {output.get('xbox_game', 'N/A')}
+Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
+-------------------------
+""")
 
+# === Vector Generation ===
 def generate_twin_vector(data: TwinRequest):
-    nt = {
-        "dopamine": round(random.uniform(0.45, 0.55), 2),
-        "serotonin": round(random.uniform(0.45, 0.55), 2),
-        "oxytocin": round(random.uniform(0.45, 0.55), 2),
-        "GABA": round(random.uniform(0.45, 0.55), 2),
-        "cortisol": round(random.uniform(0.45, 0.55), 2)
-    }
-
-    # Inferred gender tweak
-    gender = infer_gender_from_name(data.name) or data.gender
+    # Random baselines
+    nt = {k: round(random.uniform(0.45, 0.55), 2) for k in ["dopamine", "serotonin", "oxytocin", "GABA", "cortisol"]}
+    
+    gender = infer_gender(data.name)
     if gender == "female":
         nt["oxytocin"] += 0.05
     elif gender == "male":
         nt["dopamine"] += 0.05
-    life_stage = infer_life_stage(data.job_title or "", data.career_goals or "")
 
+    life_stage = infer_life_stage(data.job_title, data.career_goals)
 
-    # Apply scent effects
-    notes = get_fragrance_notes(data.scent_note)
-    for note in notes:
+    # Scent modifiers
+    for note in get_fragrance_notes(data.scent_note):
         apply_modifiers(nt, scent_map.get(note, {}))
-
-    # Apply stress keywords
-    for keyword in data.stress_keywords:
-        apply_modifiers(nt, stress_map.get(keyword.lower(), {}))
-
-    # Clamp values to [0, 1]
+    
+    # Productivity limiter keywords
+    for word in data.productivity_limiters.lower().split():
+        apply_modifiers(nt, stress_map.get(word.strip(), {}))
+    
+    # Clamp to [0, 1]
     for k in nt:
-        nt[k] = max(0, min(1, nt[k]))
+        nt[k] = round(min(1, max(0, nt[k])), 2)
 
-    # Compute brain region activations
+    # Brain regions
     brain_regions = {
-        "amygdala": (nt["cortisol"] + nt["oxytocin"]) / 2,
-        "prefrontal_cortex": (nt["dopamine"] + nt["serotonin"]) / 2,
-        "hippocampus": (nt["serotonin"] + nt["GABA"]) / 2,
-        "hypothalamus": (nt["GABA"] + nt["cortisol"]) / 2
+        "amygdala": round((nt["cortisol"] + nt["oxytocin"]) / 2, 2),
+        "prefrontal_cortex": round((nt["dopamine"] + nt["serotonin"]) / 2, 2),
+        "hippocampus": round((nt["serotonin"] + nt["GABA"]) / 2, 2),
+        "hypothalamus": round((nt["GABA"] + nt["cortisol"]) / 2, 2)
     }
 
     subvectors = {
         "amygdala": {
             "emotional_memory": round((nt["oxytocin"] + nt["cortisol"]) / 2, 2),
-            "threat_detection": round(nt["cortisol"], 2)
+            "threat_detection": nt["cortisol"]
         },
         "prefrontal_cortex": {
-            "planning": round(nt["dopamine"], 2),
+            "planning": nt["dopamine"],
             "focus": round((nt["dopamine"] + nt["serotonin"]) / 2, 2)
         },
         "hippocampus": {
-            "memory_encoding": round(nt["serotonin"], 2),
-            "spatial_navigation": round(nt["GABA"], 2)
+            "memory_encoding": nt["serotonin"],
+            "spatial_navigation": nt["GABA"]
         },
         "hypothalamus": {
             "stress_response": round((nt["cortisol"] + nt["GABA"]) / 2, 2),
-            "emotional_regulation": round(nt["GABA"], 2)
+            "emotional_regulation": nt["GABA"]
         }
     }
 
-    return {
+    output = {
         "name": data.name,
-        "age": data.age,
         "gender": gender,
-        "life_stage": life_stage, 
+        "life_stage": life_stage,
         "neurotransmitters": nt,
         "brain_regions": brain_regions,
         "subvectors": subvectors,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "reflection_tags": [data.job_title, data.productivity_limiters, data.scent_note]  # used by reflection.py
     }
-    
-    log_journal_entry(data, output)
 
+    log_journal_entry(data, output)
     return output
