@@ -1,0 +1,8 @@
+{
+  "South Asia": ["sandalwood", "jasmine", "rose"],
+  "East Asia": ["green tea", "yuzu", "ginger", "matcha"],
+  "Middle East": ["oud", "cardamom", "frankincense", "amber"],
+  "North America": ["vanilla", "cinnamon", "peppermint", "maple"],
+  "Latin America": ["citrus", "coconut", "coffee", "mango"],
+  "Europe": ["lavender", "mint", "bergamot", "pine"]
+}
