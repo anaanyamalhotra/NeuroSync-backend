@@ -101,6 +101,19 @@ def get_fragrance_notes(scent: str):
             return fragrance_db[closest]
         return []
 
+def infer_region(email: str) -> str:
+    if email.endswith(".in"):
+        return "South Asia"
+    if email.endswith(".jp") or email.endswith(".kr") or email.endswith(".cn"):
+        return "East Asia"
+    if email.endswith(".ae") or email.endswith(".sa"):
+        return "Middle East"
+    if email.endswith(".br") or email.endswith(".mx"):
+        return "Latin America"
+    if email.endswith(".fr") or email.endswith(".de") or email.endswith(".uk"):
+        return "Europe"
+    return "North America"
+
 def get_closest_scent(input_scent: str):
     scent_keys = list(fragrance_db.keys())
     matches = difflib.get_close_matches(input_scent, scent_keys, n=1, cutoff=0.5)
