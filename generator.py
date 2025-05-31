@@ -301,10 +301,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
 
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
-    
-    # Productivity limiter keywords
-    for word in data.productivity_limiters.lower().split():
-        apply_modifiers(nt, stress_map.get(word.strip(), {}))
 
     if goals_sentiment is not None:
         nt["dopamine"] += goals_sentiment * 0.04  
