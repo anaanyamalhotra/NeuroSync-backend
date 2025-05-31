@@ -157,6 +157,8 @@ def generate_twin_vector(data: TwinRequest):
         nt["dopamine"] += 0.05
 
     life_stage = infer_life_stage(data.job_title, data.career_goals)
+    age_range = infer_age_range(data.job_title, data.career_goals)
+    ethnicity = infer_ethnicity(data.name)
 
     # Scent modifiers
     for note in get_fragrance_notes(data.scent_note):
@@ -260,6 +262,8 @@ def generate_twin_vector(data: TwinRequest):
         "duration_minutes": duration_minutes,
         "switch_time": switch_time,
         "spotify_playlist": spotify_playlist,
+        "age_range": age_range,
+        "ethnicity": ethnicity,
         "scent_reinforcement": scent_reinforcement,
     }
 
