@@ -133,7 +133,7 @@ def infer_ethnicity(name: str) -> str:
     except Exception:
         return "Uncategorized"
 
-def apply_cultural_modifiers(nt, email):
+def apply_cultural_modifiers(nt: Dict[str, float], email: str, name: str):
     region = infer_region(email)
     work_env = infer_work_environment(data.email)
     style_score = email_style_score(data.email)
@@ -145,7 +145,7 @@ def apply_cultural_modifiers(nt, email):
         for k, v in modifiers.items():
             nt[k] = min(1.0, max(0.0, nt.get(k, 0.5) + v * 0.05))
 
-    return nt, region
+    return nt, region, work_env, style_score, alignment
 
 def get_fragrance_notes(scent: str):
     normalized = scent.lower().strip()
@@ -272,11 +272,8 @@ def generate_twin_vector(data: TwinRequest):
     # Clamp to [0, 1]
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
-    nt, region = apply_cultural_modifiers(nt, data.email)
-    work_env = infer_work_environment(data.email)
-    style_score = email_style_score(data.email)
-    alignment = verify_name_email_alignment(data.name, data.email)
-
+    nt, region, work_env, style_score, alignment = apply_cultural_modifiers(nt, data.email, data.name)
+    
     if work_env == "corporate":
         nt["cortisol"] = min(1, nt.get("cortisol", 0.5) + 0.05)
         nt["dopamine"] = max(0, nt.get("dopamine", 0.5) - 0.02)
