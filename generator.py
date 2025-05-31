@@ -202,6 +202,31 @@ def infer_region(email: str) -> str:
         return "Europe"
     return "North America"
 
+def extract_memory_scent_profile(childhood_memory: str, fragrance_db, scent_map):
+    blob = TextBlob(childhood_memory.lower())
+    nouns = [word for word, tag in blob.tags if tag in ("NN", "NNS", "NNP", "JJ")]
+
+    extracted_notes = []
+    for word in nouns:
+        for base_note in fragrance_db:
+            if word in base_note or base_note in word:
+                extracted_notes.append(base_note)
+
+    extracted_notes = list(set(extracted_notes))  # Deduplicate
+
+    neurotransmitter_map = {}
+    for note in extracted_notes:
+        if note in scent_map:
+            for nt in scent_map[note]:
+                neurotransmitter_map.setdefault(nt, []).append(note)
+
+    return {
+        "memory_text": childhood_memory,
+        "scent_notes": extracted_notes,
+        "neuro_map": neurotransmitter_map,
+        "linked_regions": ["hippocampus", "amygdala"]
+    }
+
 def infer_industry(job_title: str, company: str) -> str:
     text = f"{job_title} {company}".lower()
     if any(x in text for x in ["software", "engineer", "developer", "ai", "ml", "data"]):
@@ -364,6 +389,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     memory_sentiment = TextBlob(data.childhood_scent).sentiment.polarity
     nt["serotonin"] += memory_sentiment * 0.02
     nt["hippocampus_memory_boost"] = round(memory_sentiment * 0.02, 3)
+    memory_scent_profile = extract_memory_scent_profile(data.childhood_scent, fragrance_db, scent_map)
     
     # Clamp to [0, 1]
     for k in nt:
@@ -512,6 +538,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "email_style_score": style_score,
         "name_email_aligned": alignment,
         "industry": industry,
+        "memory_scent_profile": memory_scent_profile,
         "scent_profile": scent_profile,
         "scent_reinforcement": scent_reinforcement,
         "stressor_categories": classified_stressors,
