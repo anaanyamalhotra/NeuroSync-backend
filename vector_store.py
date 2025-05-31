@@ -33,22 +33,23 @@ def save_metadata(metadata):
     with open(META_PATH, "w") as f:
         json.dump(metadata, f, indent=2)
 
-# === Add new twin ===
-def add_twin(twin, vector):
+# === Add new twin to store ===
+def add_twin(twin, vector=None):
     index = load_index()
     metadata = load_metadata()
 
-    np_vec = np.array([[
-        twin["neurotransmitters"]["dopamine"],
-        twin["neurotransmitters"]["serotonin"],
-        twin["neurotransmitters"]["oxytocin"],
-        twin["neurotransmitters"]["GABA"],
-        twin["neurotransmitters"]["cortisol"]
-    ]], dtype='float32')
-
-    email_hash = hashlib.sha256(twin["name"].encode()).hexdigest()[:8]
-
-    index.add(np_vec)
+    if vector is None:
+        vector = np.array([[
+            twin["neurotransmitters"]["dopamine"],
+            twin["neurotransmitters"]["serotonin"],
+            twin["neurotransmitters"]["oxytocin"],
+            twin["neurotransmitters"]["GABA"],
+            twin["neurotransmitters"]["cortisol"]
+        ]], dtype='float32')
+    
+    index.add(vector)
+    
+    user_id = hashlib.sha256(twin["name"].encode()).hexdigest()[:8]
     metadata.append({
         "name": twin["name"],
         "gender": twin["gender"],
@@ -57,8 +58,40 @@ def add_twin(twin, vector):
         "ethnicity": twin["ethnicity"],
         "timestamp": twin["timestamp"],
         "vector_id": len(metadata),
-        "user_id": email_hash
+        "user_id": user_id
     })
 
     save_index(index)
     save_metadata(metadata)
+
+# === Search for similar twins ===
+def search_similar_twins(query_vector, top_k=5, filters=None):
+    index = load_index()
+    metadata = load_metadata()
+
+    query = np.array([[
+        query_vector["dopamine"],
+        query_vector["serotonin"],
+        query_vector["oxytocin"],
+        query_vector["GABA"],
+        query_vector["cortisol"]
+    ]], dtype='float32')
+
+    if index.ntotal == 0:
+        return []
+
+    distances, indices = index.search(query, top_k)
+
+    similar = []
+    for i, idx in enumerate(indices[0]):
+        if idx >= len(metadata):
+            continue
+        entry = metadata[idx]
+        if filters:
+            match = all(entry.get(k) == v for k, v in filters.items())
+            if not match:
+                continue
+        entry["distance"] = float(distances[0][i])
+        similar.append(entry)
+    return similar
+
