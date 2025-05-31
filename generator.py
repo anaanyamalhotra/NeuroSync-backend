@@ -61,6 +61,33 @@ def infer_gender(name):
     except:
         return "neutral"
 
+def infer_work_environment(email: str) -> str:
+    domain = email.split("@")[-1].lower()
+    if any(domain.startswith(p) for p in ["gmail", "yahoo", "outlook", "hotmail"]):
+        return "general_consumer"
+    elif "edu" in domain:
+        return "academic"
+    else:
+        return "corporate"
+
+def email_style_score(email: str) -> float:
+    username = email.split("@")[0]
+    score = 0
+    if any(char.isdigit() for char in username):
+        score -= 0.1
+    if "." in username:
+        score += 0.1
+    if username.islower():
+        score += 0.1
+    if any(x in username.lower() for x in ["x", "lol", "420", "gamer"]):
+        score -= 0.2
+    return round(score, 2)
+
+def verify_name_email_alignment(name: str, email: str) -> bool:
+    email_username = email.split("@")[0].lower()
+    name_parts = name.lower().split()
+    return any(part in email_username for part in name_parts)
+
 def infer_life_stage(age):
     if age < 13:
         return "child"
@@ -108,6 +135,9 @@ def infer_ethnicity(name: str) -> str:
 
 def apply_cultural_modifiers(nt, email):
     region = infer_region(email)
+    work_env = infer_work_environment(data.email)
+    style_score = email_style_score(data.email)
+    alignment = verify_name_email_alignment(data.name, data.email)
     favored_scents = cultural_affinities.get(region, [])
     
     for scent in favored_scents:
@@ -243,6 +273,29 @@ def generate_twin_vector(data: TwinRequest):
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
     nt, region = apply_cultural_modifiers(nt, data.email)
+    work_env = infer_work_environment(data.email)
+    style_score = email_style_score(data.email)
+    alignment = verify_name_email_alignment(data.name, data.email)
+
+    if work_env == "corporate":
+        nt["cortisol"] = min(1, nt.get("cortisol", 0.5) + 0.05)
+        nt["dopamine"] = max(0, nt.get("dopamine", 0.5) - 0.02)
+
+    elif work_env == "academic":
+        nt["serotonin"] = min(1, nt.get("serotonin", 0.5) + 0.05)
+
+    elif work_env == "general_consumer":
+        nt["oxytocin"] = min(1, nt.get("oxytocin", 0.5) + 0.02)
+
+    if style_score < 0:
+        nt["GABA"] = max(0, nt.get("GABA", 0.5) - 0.05)
+        nt["dopamine"] = min(1, nt.get("dopamine", 0.5) + 0.05)
+
+    else:
+        nt["GABA"] = min(1, nt.get("GABA", 0.5) + 0.05)
+
+    if alignment:
+        nt["oxytocin"] = min(1, nt.get("oxytocin", 0.5) + 0.03)
 
     # Brain regions
     brain_regions = {
@@ -358,6 +411,9 @@ def generate_twin_vector(data: TwinRequest):
         "age_range": age_range,
         "ethnicity": ethnicity,
         "region": region,
+        "work_env": work_env,
+        "email_style_score": style_score,
+        "name_email_aligned": alignment,
         "scent_reinforcement": scent_reinforcement,
     }
 
