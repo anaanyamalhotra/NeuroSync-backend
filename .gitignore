@@ -10,3 +10,5 @@ __pycache__/
 .idea/
 .vscode/
 *.log
+vector_store/*.index
+vector_store/*.json
