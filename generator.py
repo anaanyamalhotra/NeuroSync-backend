@@ -242,7 +242,7 @@ def generate_twin_vector(data: TwinRequest):
     # Clamp to [0, 1]
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
-        nt, region = apply_cultural_modifiers(nt, data.email)
+    nt, region = apply_cultural_modifiers(nt, data.email)
 
     # Brain regions
     brain_regions = {
