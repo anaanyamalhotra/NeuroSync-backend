@@ -4,6 +4,8 @@ import json, os, random
 from datetime import datetime
 import requests
 import difflib
+import pandas as pd
+from ethnicolr import pred_fl_reg_name
 
 # === Load fragrance notes JSON ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
@@ -55,15 +57,38 @@ def infer_gender(name):
     except:
         return "neutral"
 
-def infer_life_stage(job_title: str, goals: str) -> str:
+def infer_age_range(job_title: str, goals: str) -> str:
     text = f"{job_title} {goals}".lower()
     if any(k in text for k in ["student", "intern", "trainee"]):
-        return "young_adult"
+        return "18-25"
     elif any(k in text for k in ["manager", "executive", "founder"]):
-        return "adult"
+        return "25-40"
     elif "retired" in text:
-        return "senior"
-    return "adult"
+        return "60+"
+    return "25-40"
+
+def infer_ethnicity(name: str) -> str:
+    parts = name.strip().split()
+    if len(parts) < 2:
+        return "Uncategorized"
+    
+    first_name, last_name = parts[0], parts[-1]
+    df = pd.DataFrame([{"first": first_name, "last": last_name}])
+    try:
+        df = pred_fl_reg_name(df, "last", "first")
+        race = df.loc[0, "race"]
+
+        ethnicity_map = {
+            "api": "East Asian",
+            "black": "Black",
+            "hispanic": "Latinx",
+            "white": "Western",
+            "other": "Other"
+        }
+
+        return ethnicity_map.get(race, "Uncategorized")
+    except Exception:
+        return "Uncategorized"
 
 def get_fragrance_notes(scent: str):
     normalized = scent.lower().strip()
