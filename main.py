@@ -264,8 +264,19 @@ Stay mindful and pace your energy today.
         return {"journal_entry": local_fallback()}
 
 @app.get("/twins")
-def get_twin_by_id(vector_id: int):
+def get_twins(
+    gender: Optional[str] = None,
+    life_stage: Optional[str] = None,
+    user_id: Optional[str] = None,
+    limit: Optional[int] = None
+):
     metadata = load_metadata()
-    if 0 <= vector_id < len(metadata):
-        return metadata[vector_id]
-    raise HTTPException(status_code=404, detail="Twin not found.")
+    results = [
+        m for m in metadata
+        if (not gender or m["gender"] == gender)
+        and (not life_stage or m["life_stage"] == life_stage)
+        and (not user_id or m.get("user_id") == user_id)
+    ]
+    if limit:
+        results = results[:limit]
+    return results
