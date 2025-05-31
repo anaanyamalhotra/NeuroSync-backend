@@ -131,7 +131,18 @@ async def generate(data: TwinRequest):
         twin["timestamp"] = datetime.utcnow().isoformat()
 
         print("== ✅ Final Output ==", twin)
-        return twin
+        return {
+            "status": "success",
+            "neurotransmitters": twin.get("neurotransmitters"),
+            "xbox_game": twin.get("xbox_game"),
+            "game_mode": twin.get("game_mode"),
+            "duration_minutes": twin.get("duration_minutes"),
+            "switch_time": twin.get("switch_time"),
+            "spotify_playlist": twin.get("spotify_playlist"),
+            "match_reason": twin.get("match_reason"),
+            "twin_vector": twin,
+            "timestamp": twin.get("timestamp")
+        }
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
