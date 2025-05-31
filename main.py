@@ -10,6 +10,7 @@ import requests
 import openai
 from generator import generate_twin_vector, infer_gender, apply_modifiers, extract_keywords
 import nltk
+from generator import build_scent_profile
 from vector_store import add_twin
 from fastapi import Query
 from vector_store import load_metadata
@@ -149,6 +150,7 @@ async def generate(data: TwinRequest):
         goals_sentiment = TextBlob(data.career_goals).sentiment.polarity
         stressors_sentiment = TextBlob(data.productivity_limiters).sentiment.polarity
         twin = generate_twin_vector(data, goals_sentiment=goals_sentiment, stressors_sentiment=stressors_sentiment)
+        scent_profile = build_scent_profile(data.scent_note)
         print(f"📊 Sentiment — Goals: {goals_sentiment}, Stressors: {stressors_sentiment}")
 
         twin["goals_sentiment"] = goals_sentiment
@@ -196,6 +198,7 @@ async def generate(data: TwinRequest):
             "subvectors": twin.get("subvectors", {}),
             "scent_reinforcement": twin.get("scent_reinforcement", "lavender"),
             "lowest_region": twin.get("lowest_region", "")
+            "scent_profile": scent_profile,
         }
         print("== ✅ Final Output ==", output)
         return output
