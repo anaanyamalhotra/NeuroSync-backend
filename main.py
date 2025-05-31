@@ -13,6 +13,7 @@ import nltk
 from generator import build_scent_profile
 from vector_store import add_twin
 from fastapi import Query
+from generator import extract_memory_scent_profile
 from vector_store import load_metadata
 from textblob import TextBlob
 from generator import infer_life_stage_from_text
@@ -151,6 +152,7 @@ async def generate(data: TwinRequest):
         stressors_sentiment = TextBlob(data.productivity_limiters).sentiment.polarity
         twin = generate_twin_vector(data, goals_sentiment=goals_sentiment, stressors_sentiment=stressors_sentiment)
         scent_profile = build_scent_profile(data.scent_note)
+        memory_scent_profile = extract_memory_scent_profile(data.childhood_scent, fragrance_db, scent_map)
         print(f"📊 Sentiment — Goals: {goals_sentiment}, Stressors: {stressors_sentiment}")
 
         twin["goals_sentiment"] = goals_sentiment
@@ -190,6 +192,7 @@ async def generate(data: TwinRequest):
             "spotify_playlist": twin.get("spotify_playlist", "Focus Boost"),
             "match_reason": twin.get("match_reason", "No reason provided."),
             "twin_vector": twin,
+            "memory_scent_profile": memory_scent_profile,
             "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
             "brain_regions": twin.get("brain_regions", {}),
             "vector_id": vector_id,
