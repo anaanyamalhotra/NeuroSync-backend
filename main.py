@@ -131,18 +131,24 @@ async def generate(data: TwinRequest):
         twin["timestamp"] = datetime.utcnow().isoformat()
 
         print("== ✅ Final Output ==", twin)
-        return {
+        output = {
             "status": "success",
-            "neurotransmitters": twin.get("neurotransmitters"),
-            "xbox_game": twin.get("xbox_game"),
-            "game_mode": twin.get("game_mode"),
-            "duration_minutes": twin.get("duration_minutes"),
-            "switch_time": twin.get("switch_time"),
-            "spotify_playlist": twin.get("spotify_playlist"),
-            "match_reason": twin.get("match_reason"),
+            "neurotransmitters": twin.get("neurotransmitters", {}),
+            "xbox_game": twin.get("xbox_game", "Unknown Game"),
+            "game_mode": twin.get("game_mode", "Solo"),
+            "duration_minutes": twin.get("duration_minutes", 20),
+            "switch_time": twin.get("switch_time", "After 20 mins"),
+            "spotify_playlist": twin.get("spotify_playlist", "Focus Boost"),
+            "match_reason": twin.get("match_reason", "No reason provided."),
             "twin_vector": twin,
-            "timestamp": twin.get("timestamp")
+            "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
+            "brain_regions": twin.get("brain_regions", {}),
+            "subvectors": twin.get("subvectors", {}),
+            "scent_reinforcement": twin.get("scent_reinforcement", "lavender"),
+            "lowest_region": twin.get("lowest_region", "")
         }
+        print("== ✅ Final Output ==", output)
+        return output
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
