@@ -1,5 +1,12 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('brown')
+nltk.download('movie_reviews')
+nltk.download('conll2000')
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
