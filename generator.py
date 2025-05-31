@@ -128,6 +128,16 @@ def get_fragrance_notes(scent: str):
             return fragrance_db[closest]
         return []
 
+def infer_life_stage_from_text(job_title: str, goals: str) -> str:
+    text = f"{job_title} {goals}".lower()
+    if any(k in text for k in ["student", "intern", "trainee"]):
+        return "young_adult"
+    elif any(k in text for k in ["manager", "executive", "founder"]):
+        return "adult"
+    elif "retired" in text:
+        return "senior"
+    return "adult"
+
 def infer_region(email: str) -> str:
     if email.endswith(".in"):
         return "South Asia"
@@ -217,7 +227,7 @@ def generate_twin_vector(data: TwinRequest):
     elif gender == "male":
         nt["dopamine"] += 0.05
 
-    life_stage = infer_life_stage(data.job_title, data.career_goals)
+    life_stage = infer_life_stage_from_text(data.job_title, data.career_goals)
     age_range = infer_age_range(data.job_title, data.career_goals)
     ethnicity = infer_ethnicity(data.name)
 
