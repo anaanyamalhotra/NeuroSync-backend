@@ -547,6 +547,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
             "favored_scents": cultural_affinities.get(region, [])
         
         }
+        }
 
     required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
     for key in required_keys:
