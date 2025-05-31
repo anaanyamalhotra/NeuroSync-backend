@@ -174,6 +174,8 @@ Timestamp: {output['timestamp']}
 Name: {data.name}
 Gender: {output['gender']}
 Life Stage: {output['life_stage']}
+Circadian Window: {output.get('circadian_window', 'N/A')}
+Circadian Notes: {" | ".join(output.get('circadian_note', []))}
 Neurotransmitters: {output['neurotransmitters']}
 Reflection Tags: {output.get('reflection_tags', [])}
 Suggested Game: {output.get('xbox_game', 'N/A')}
