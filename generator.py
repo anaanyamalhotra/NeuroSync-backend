@@ -124,7 +124,7 @@ def infer_ethnicity(name: str) -> str:
         return "Uncategorized"
     
     first_name, last_name = parts[0], parts[-1]
-    df = pd.DataFrame([{"first": first_name, "last": last_name}])
+    df = pd.DataFrame({"first": [first_name], "last": [last_name]})
     try:
         df = pred_fl_reg_name(df, "last", "first")
         race = df.loc[0, "race"]
