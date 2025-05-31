@@ -332,10 +332,6 @@ def generate_twin_vector(data: TwinRequest):
         circadian_window = "evening"
 
     circadian_note = [f"You are more cognitively active in the {circadian_window}."]
-    output.update({
-        "circadian_window": circadian_window,
-        "circadian_note": circadian_note
-    })
 
     output = {
         "name": data.name,
