@@ -556,5 +556,23 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
 
     print("✅ FINAL OUTPUT from generate_twin_vector:", output)
 
+    def determine_cognitive_focus(subvectors):
+        region_strengths = {
+            region: sum(subvectors[region].values()) for region in subvectors
+        }
+        dominant_region = max(region_strengths, key=region_strengths.get)
+        if dominant_region == "amygdala":
+            return "Emotional AI"
+        elif dominant_region == "hippocampus":
+            return "Memory-Augmented NLP"
+        elif dominant_region == "hypothalamus":
+            return "Adaptive Stress Interfaces"
+        elif dominant_region == "prefrontal_cortex":
+            return "Cognitive Planning Systems"
+        else:
+            return "General Cognitive Modeling"
+    output["cognitive_focus"] = determine_cognitive_focus(subvectors)
+
+
     log_journal_entry(data, output)
     return output
