@@ -89,6 +89,7 @@ class TwinRequest(BaseModel):
     productivity_limiters: str
     scent_note: str
     childhood_scent: str
+    assigned_sex: Optional[str] = "unspecified"
 
 class ReflectRequest(BaseModel):
     name: str
