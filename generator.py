@@ -181,6 +181,21 @@ def infer_region(email: str) -> str:
         return "Europe"
     return "North America"
 
+def infer_industry(job_title: str, company: str) -> str:
+    text = f"{job_title} {company}".lower()
+    if any(x in text for x in ["software", "engineer", "developer", "ai", "ml", "data"]):
+        return "Tech"
+    elif any(x in text for x in ["doctor", "nurse", "clinic", "hospital", "health"]):
+        return "Healthcare"
+    elif any(x in text for x in ["law", "attorney", "legal", "firm"]):
+        return "Legal"
+    elif any(x in text for x in ["finance", "investment", "bank", "analyst", "accountant"]):
+        return "Finance"
+    elif any(x in text for x in ["teacher", "professor", "school", "education"]):
+        return "Education"
+    else:
+        return "General"
+
 def analyze_circadian_rhythm(nt, timestamp):
     hour = datetime.fromisoformat(timestamp).hour
     circadian_window = (
@@ -260,6 +275,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     life_stage = infer_life_stage_from_text(data.job_title, data.career_goals)
     age_range = infer_age_range(data.job_title, data.career_goals)
     ethnicity = infer_ethnicity(data.name)
+    industry = infer_industry(data.job_title, data.company)
 
     # Scent modifiers
     for note in get_fragrance_notes(data.scent_note):
@@ -281,6 +297,20 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
     nt, region, work_env, style_score, alignment = apply_cultural_modifiers(nt, data.email, data.name)
+
+    job_title_lower = data.job_title.lower()
+    if "manager" in job_title_lower:
+        nt["cortisol"] += 0.05
+
+    if "analyst" in job_title_lower or "developer" in job_title_lower:
+        nt["dopamine"] += 0.04
+
+    if "intern" in job_title_lower or "student" in job_title_lower:
+        nt["serotonin"] -= 0.02
+
+    if "founder" in job_title_lower or "executive" in job_title_lower:
+        nt["dopamine"] += 0.05
+        nt["cortisol"] += 0.05
     
     if work_env == "corporate":
         nt["cortisol"] = min(1, nt.get("cortisol", 0.5) + 0.05)
@@ -409,6 +439,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "work_env": work_env,
         "email_style_score": style_score,
         "name_email_aligned": alignment,
+        "industry": industry,
         "scent_reinforcement": scent_reinforcement,
     }
 
