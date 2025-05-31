@@ -7,3 +7,4 @@ textblob
 tldextract
 psycopg2-binary
 python-dotenv
+nltk>=3.8
