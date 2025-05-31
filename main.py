@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -315,15 +316,23 @@ def get_twins(
     user_id: Optional[str] = None,
     limit: Optional[int] = None
 ):
-    metadata = load_metadata()
-    results = [
-        m for m in metadata
-        if (not gender or m["gender"] == gender)
-        and (not life_stage or m["life_stage"] == life_stage)
-        and (not age_range or m.get("age_range") == age_range)
-        and (not ethnicity or m.get("ethnicity") == ethnicity)
-        and (not user_id or m.get("user_id") == user_id)
-    ]
-    if limit:
-        results = results[:limit]
-    return results
+    try:
+        metadata = load_metadata()
+
+        results = [
+            m for m in metadata
+            if (not gender or m.get("gender") == gender)
+            and (not life_stage or m.get("life_stage") == life_stage)
+            and (not age_range or m.get("age_range") == age_range)
+            and (not ethnicity or m.get("ethnicity") == ethnicity)
+            and (not user_id or m.get("user_id") == user_id)
+        ]
+
+        if limit:
+            results = results[:limit]
+
+        return JSONResponse(content={"status": "success", "count": len(results), "twins": results})
+
+    except Exception as e:
+        print("❌ ERROR in /twins:", str(e))
+        return JSONResponse(status_code=500, content={"status": "error", "detail": str(e)})
