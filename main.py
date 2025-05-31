@@ -117,14 +117,26 @@ async def generate(data: TwinRequest):
     try:
         print("== ✅ Request received at /generate ==")
         twin = generate_twin_vector(data)
+
+        print("DEBUG: Twin vector keys:", list(twin.keys()))
+
+        # Defensive check
+        required_keys = ["neurotransmitters", "xbox_game"]
+        for key in required_keys:
+            if key not in twin:
+                raise ValueError(f"❌ Key '{key}' missing from twin output")
+
         game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
         twin.update(game)
         twin["timestamp"] = datetime.utcnow().isoformat()
-        print("== ✅ Final Output ==")
+
+        print("== ✅ Final Output ==", twin)
         return twin
+
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
-        return {"error": str(e)}
+        # Explicit status to help Streamlit know this is an error
+        return {"status": "error", "message": str(e)}
 
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
