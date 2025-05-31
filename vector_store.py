@@ -56,7 +56,7 @@ def add_twin(twin, vector):
         "age_range": twin["age_range"],
         "ethnicity": twin["ethnicity"],
         "timestamp": twin["timestamp"],
-        "vector_id": len(metadata)
+        "vector_id": len(metadata),
         "user_id": email_hash
     })
 
