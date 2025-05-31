@@ -149,12 +149,13 @@ async def generate(data: TwinRequest):
         }
         print("== ✅ Final Output ==", output)
         return output
+    from fastapi import HTTPException
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
+        raise HTTPException(status_code=500, detail=f"Internal Error: {e}")
         # Explicit status to help Streamlit know this is an error
-        return {"status": "error", "message": str(e)}
-
+        
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
     try:
