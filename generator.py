@@ -253,7 +253,21 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 
 # === Vector Generation ===
 def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sentiment=None):
+    stress_categories = {
+        "social": ["communication", "manager", "team", "conflict"],
+        "workload": ["deadline", "overload", "multitasking", "burnout"],
+        "environment": ["noise", "space", "distractions"]
+    }
+    classified_stressors = {"social": [], "workload": [], "environment": []}
+    stress_words = extract_keywords(data.productivity_limiters)
+    for word in stress_words:
+        for category, terms in stress_categories.items():
+            if word.lower() in terms:
+                classified_stressors[category].append(word.lower())
+    
+    
     # Random baselines
+    
     baseline_nt = {
         "dopamine": 0.55,
         "serotonin": 0.60,
@@ -309,6 +323,10 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     if stressors_sentiment is not None:
         nt["cortisol"] += stressors_sentiment * 0.05
         nt["GABA"] -= stressors_sentiment * 0.03
+
+    memory_sentiment = TextBlob(data.childhood_scent).sentiment.polarity
+    nt["serotonin"] += memory_sentiment * 0.02
+    nt["hippocampus_memory_boost"] = round(memory_sentiment * 0.02, 3)
     
     # Clamp to [0, 1]
     for k in nt:
@@ -458,7 +476,12 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "name_email_aligned": alignment,
         "industry": industry,
         "scent_reinforcement": scent_reinforcement,
-    }
+        "stressor_categories": classified_stressors,
+        "olfactory_region_modeling": {
+            "region": region,
+            "favored_scents": cultural_affinities.get(region, [])
+        
+        }
 
     required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
     for key in required_keys:
