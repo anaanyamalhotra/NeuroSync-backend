@@ -128,6 +128,25 @@ def infer_region(email: str) -> str:
         return "Europe"
     return "North America"
 
+def analyze_circadian_rhythm(nt, timestamp):
+    hour = datetime.fromisoformat(timestamp).hour
+    circadian_window = (
+        "morning" if 5 <= hour < 12 else
+        "afternoon" if 12 <= hour < 17 else
+        "evening" if 17 <= hour < 22 else
+        "night"
+    )
+
+    circadian_note = []
+    if circadian_window == "night" and nt["cortisol"] > 0.6:
+        circadian_note.append("High cortisol at night may disrupt sleep. Try journaling, lavender, or screen breaks.")
+    if circadian_window == "morning" and nt["GABA"] < 0.4:
+        circadian_note.append("Low GABA in the morning may indicate unrestful sleep. Try exposure to sunlight and a consistent wake time.")
+    if nt["dopamine"] > 0.7 and circadian_window == "night":
+        circadian_note.append("Elevated dopamine late at night may reflect overstimulation. Consider a calming wind-down ritual.")
+
+    return circadian_window, circadian_note
+
 def get_closest_scent(input_scent: str):
     scent_keys = list(fragrance_db.keys())
     matches = difflib.get_close_matches(input_scent, scent_keys, n=1, cutoff=0.5)
@@ -276,6 +295,9 @@ def generate_twin_vector(data: TwinRequest):
         duration_minutes = 30
         switch_time = "every 15 mins"
 
+    timestamp = datetime.utcnow().isoformat()
+    circadian_window, circadian_note = analyze_circadian_rhythm(nt, timestamp)
+
     output = {
         "name": data.name,
         "gender": gender,
@@ -283,7 +305,9 @@ def generate_twin_vector(data: TwinRequest):
         "neurotransmitters": nt,
         "brain_regions": brain_regions,
         "subvectors": subvectors,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": timestamp,
+        "circadian_window": circadian_window,
+        "circadian_note": circadian_note,
         "reflection_tags": [data.job_title, data.productivity_limiters, data.scent_note],
         "xbox_game": xbox_game,
         "game_mode": game_mode,
