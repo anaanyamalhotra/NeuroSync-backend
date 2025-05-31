@@ -242,13 +242,33 @@ Stay mindful and pace your energy today.
         def build_prompt():
             insights = analyze_neuro(data.neurotransmitters or {})
             joined_insights = "\n".join(insights)
+            work_env = data.neurotransmitters.get("work_env", "general_consumer")
+            style_score = data.neurotransmitters.get("email_style_score", 0)
+            aligned = data.neurotransmitters.get("name_email_aligned", False)
+
+            if work_env == "corporate":
+                tone = "Focus on work-life balance and actionable calm-down strategies. Assume the user may be under pressure."
+
+            elif work_env == "academic":
+                tone = "Emphasize structure, routine, and intellectual grounding. Recommend curiosity-fueled recovery strategies."
+
+            else:
+                tone = "Keep the tone empathetic and casual — support emotional regulation and creative rejuvenation."
+
+            if style_score < 0:
+                tone += " Keep it light and encouraging — possibly a younger or expressive user."
+
+            elif aligned:
+                tone += " You can assume the user is self-aware and identity-aligned. Reinforce motivation gently."
+
             game_reco = f"Today’s game: {data.xbox_game} ({data.game_mode}), play for ~{data.duration_minutes} minutes, then switch: {data.switch_time}."
             playlist = f"We’ve also curated a Spotify playlist for today: {data.name}'s {data.game_mode} Vibes 🎶"
             return (
                 f"My name is {data.name}. I feel {data.current_emotion}. "
                 f"Recent events include: {data.recent_events}. My goals are: {data.goals}. "
                 f"Based on my brain chemistry, here's what's going on: {joined_insights}. "
-                f"{game_reco} Suggest a daily routine, calming scent and a Spotify playlist to help."
+                f"{game_reco} Suggest a daily routine, calming scent and a Spotify playlist to help.\n\n"
+                f"🎯 Context: {tone}"
             )
 
         prompt = build_prompt()
