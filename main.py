@@ -13,6 +13,7 @@ import nltk
 from vector_store import add_twin
 from fastapi import Query
 from vector_store import load_metadata
+from textblob import TextBlob
 
 from textblob import download_corpora
 nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
@@ -144,6 +145,12 @@ async def generate(data: TwinRequest):
     try:
         print("== ✅ Request received at /generate ==")
         twin = generate_twin_vector(data)
+        goals_sentiment = TextBlob(data.career_goals).sentiment.polarity
+        stressors_sentiment = TextBlob(data.productivity_limiters).sentiment.polarity
+        print(f"📊 Sentiment — Goals: {goals_sentiment}, Stressors: {stressors_sentiment}")
+
+        twin["goals_sentiment"] = goals_sentiment
+        twin["stressors_sentiment"] = stressors_sentiment
         add_twin(twin, twin["neurotransmitters"])
 
         from vector_store import load_metadata  # already imported at the top
@@ -176,6 +183,8 @@ async def generate(data: TwinRequest):
             "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
             "brain_regions": twin.get("brain_regions", {}),
             "vector_id": vector_id,
+            "goals_sentiment": twin.get("goals_sentiment", 0),
+            "stressors_sentiment": twin.get("stressors_sentiment", 0),
             "subvectors": twin.get("subvectors", {}),
             "scent_reinforcement": twin.get("scent_reinforcement", "lavender"),
             "lowest_region": twin.get("lowest_region", "")
