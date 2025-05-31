@@ -300,6 +300,20 @@ def generate_twin_vector(data: TwinRequest):
     timestamp = datetime.utcnow().isoformat()
     circadian_window, circadian_note = analyze_circadian_rhythm(nt, timestamp)
 
+    current_hour = datetime.utcnow().hour
+    if 5 <= current_hour < 12:
+        circadian_window = "morning"
+    elif 12 <= current_hour < 18:
+        circadian_window = "afternoon"
+    else:
+        circadian_window = "evening"
+
+    circadian_note = [f"You are more cognitively active in the {circadian_window}."]
+    output.update({
+        "circadian_window": circadian_window,
+        "circadian_note": circadian_note
+    })
+
     output = {
         "name": data.name,
         "gender": gender,
