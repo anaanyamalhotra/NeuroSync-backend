@@ -321,7 +321,13 @@ def generate_twin_vector(data: TwinRequest):
         switch_time = "every 15 mins"
 
     timestamp = datetime.utcnow().isoformat()
-    circadian_window, circadian_note = analyze_circadian_rhythm(nt, timestamp)
+
+    try:
+        circadian_window, circadian_note = analyze_circadian_rhythm(nt, timestamp)
+    except Exception as e:
+        print(f"⚠️ Error analyzing circadian rhythm: {e}")
+        circadian_window = "unknown"
+        circadian_note = ["Circadian rhythm data unavailable."]
 
     current_hour = datetime.utcnow().hour
     if 5 <= current_hour < 12:
