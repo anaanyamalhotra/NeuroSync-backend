@@ -10,3 +10,4 @@ python-dotenv
 nltk>=3.8
 textblob>=0.17
 faiss-cpu
+pandas
