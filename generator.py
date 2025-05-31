@@ -51,6 +51,7 @@ class TwinRequest(BaseModel):
     productivity_limiters: str
     scent_note: str
     childhood_scent: str
+    assigned_sex: Optional[str] = "unspecified"
 
 # === Helper Functions ===
 def infer_gender(name):
@@ -242,6 +243,7 @@ Timestamp: {output['timestamp']}
 Name: {data.name}
 Gender: {output['gender']}
 Life Stage: {output['life_stage']}
+Assigned Sex: {data.assigned_sex}
 Circadian Window: {output.get('circadian_window', 'N/A')}
 Circadian Notes: {" | ".join(output.get('circadian_note', []))}
 Neurotransmitters: {output['neurotransmitters']}
@@ -285,6 +287,19 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         nt["oxytocin"] += 0.05
     elif gender == "male":
         nt["dopamine"] += 0.05
+
+    assigned_sex = getattr(data, "assigned_sex", "").lower()
+    if assigned_sex == "female":
+        nt["oxytocin"] += 0.07
+        nt["serotonin"] += 0.02
+        if "musk" in data.scent_note.lower():
+            nt["amygdala"] = round(nt.get("amygdala", 0.5) - 0.03, 2)
+
+    elif assigned_sex == "male":
+        nt["dopamine"] += 0.05
+        nt["cortisol"] += 0.03
+        if "musk" in data.scent_note.lower() or "androstadienone" in data.scent_note.lower():
+            nt["amygdala"] = round(nt.get("amygdala", 0.5) + 0.04, 2)
 
     life_stage = infer_life_stage_from_text(data.job_title, data.career_goals)
     age_range = infer_age_range(data.job_title, data.career_goals)
