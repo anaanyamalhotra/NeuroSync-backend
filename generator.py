@@ -60,6 +60,18 @@ def infer_gender(name):
     except:
         return "neutral"
 
+def infer_life_stage(age):
+    if age < 13:
+        return "child"
+    elif 13 <= age < 18:
+        return "teen"
+    elif 18 <= age < 30:
+        return "young_adult"
+    elif 30 <= age < 50:
+        return "adult"
+    else:
+        return "senior"
+
 def infer_age_range(job_title: str, goals: str) -> str:
     text = f"{job_title} {goals}".lower()
     if any(k in text for k in ["student", "intern", "trainee"]):
