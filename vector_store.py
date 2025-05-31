@@ -3,6 +3,7 @@ import faiss
 import numpy as np
 import os
 import json
+import hashlib
 
 VECTOR_DIM = 5  # dopamine, serotonin, oxytocin, GABA, cortisol
 INDEX_PATH = "vector_store/faiss_index.index"
@@ -45,13 +46,16 @@ def add_twin(twin, vector):
         twin["neurotransmitters"]["cortisol"]
     ]], dtype='float32')
 
+    email_hash = hashlib.sha256(twin["name"].encode()).hexdigest()[:8]
+
     index.add(np_vec)
     metadata.append({
         "name": twin["name"],
         "gender": twin["gender"],
         "life_stage": twin["life_stage"],
         "timestamp": twin["timestamp"],
-        "vector_id": len(metadata)  # matches FAISS index
+        "vector_id": len(metadata)
+        "user_id": email_hash
     })
 
     save_index(index)
