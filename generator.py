@@ -237,7 +237,7 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 """)
 
 # === Vector Generation ===
-def generate_twin_vector(data: TwinRequest):
+def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sentiment=None):
     # Random baselines
     baseline_nt = {
         "dopamine": 0.55,
@@ -268,6 +268,14 @@ def generate_twin_vector(data: TwinRequest):
     # Productivity limiter keywords
     for word in data.productivity_limiters.lower().split():
         apply_modifiers(nt, stress_map.get(word.strip(), {}))
+
+    if goals_sentiment is not None:
+        nt["dopamine"] += goals_sentiment * 0.04  
+        nt["serotonin"] += goals_sentiment * 0.02
+
+    if stressors_sentiment is not None:
+        nt["cortisol"] += stressors_sentiment * 0.05
+        nt["GABA"] -= stressors_sentiment * 0.03
     
     # Clamp to [0, 1]
     for k in nt:
