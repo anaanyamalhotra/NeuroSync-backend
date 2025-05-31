@@ -11,6 +11,9 @@ from ethnicolr import pred_fl_reg_name
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
+with open(os.path.join(os.path.dirname(__file__), "cultural_affinities.json"), "r") as f:
+    cultural_affinities = json.load(f)
+
 # === Scent and Stress Maps ===
 scent_map = {
     "lavender": {"GABA": 0.15, "cortisol": -0.1},
