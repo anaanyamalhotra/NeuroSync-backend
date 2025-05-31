@@ -267,6 +267,8 @@ Stay mindful and pace your energy today.
 def get_twins(
     gender: Optional[str] = None,
     life_stage: Optional[str] = None,
+    age_range: Optional[str] = None,
+    ethnicity: Optional[str] = None,
     user_id: Optional[str] = None,
     limit: Optional[int] = None
 ):
@@ -275,6 +277,8 @@ def get_twins(
         m for m in metadata
         if (not gender or m["gender"] == gender)
         and (not life_stage or m["life_stage"] == life_stage)
+        and (not age_range or m.get("age_range") == age_range)
+        and (not ethnicity or m.get("ethnicity") == ethnicity)
         and (not user_id or m.get("user_id") == user_id)
     ]
     if limit:
