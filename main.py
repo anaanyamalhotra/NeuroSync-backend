@@ -1,12 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import nltk
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
-nltk.download('brown')
-nltk.download('movie_reviews')
-nltk.download('conll2000')
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -16,7 +9,13 @@ import random
 import requests
 import openai
 from generator import generate_twin_vector, infer_gender, apply_modifiers, extract_keywords
+import nltk
+from textblob import download_corpora
 
+try:
+    download_corpora.download_all()
+except Exception as e:
+    print("⚠️ Could not download corpora:", e)
 # === INIT ===
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
