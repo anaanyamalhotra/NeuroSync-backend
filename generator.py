@@ -25,7 +25,14 @@ scent_map = {
     "bergamot": {"serotonin": 0.12, "GABA": 0.08},   
     "cinnamon": {"dopamine": 0.15},     
     "tonka bean": {"oxytocin": 0.08, "dopamine": 0.04}, 
-    "linalool": {"GABA": 0.18, "cortisol": -0.12}    
+    "linalool": {"GABA": 0.18, "cortisol": -0.12},
+    "musk": {"oxytocin": 0.1, "amygdala": 0.03},
+    "androstadienone": {"dopamine": 0.12, "cortisol": 0.08, "amygdala": 0.06},
+    "sandalwood": {"GABA": 0.1, "serotonin": 0.06},
+    "amber": {"dopamine": 0.05, "oxytocin": 0.07}, 
+    "jasmine": {"serotonin": 0.1, "oxytocin": 0.08},
+    "cedarwood": {"GABA": 0.1, "cortisol": -0.05}, 
+    "ylang ylang": {"oxytocin": 0.1, "dopamine": 0.06},
 }
 
 stress_map = {
@@ -158,6 +165,19 @@ def get_fragrance_notes(scent: str):
             print(f"[Fallback] Scent '{scent}' not found. Using closest match: '{closest}'")
             return fragrance_db[closest]
         return []
+
+def build_scent_profile(scent: str):
+    notes = get_fragrance_notes(scent)
+    nt_map = {}
+    for note in notes:
+        effects = scent_map.get(note.lower(), {})
+        for nt in effects:
+            nt_map.setdefault(nt, []).append(note)
+    return {
+        "scent": scent,
+        "notes": notes,
+        "neurotransmitter_map": nt_map
+    }
 
 def infer_life_stage_from_text(job_title: str, goals: str) -> str:
     text = f"{job_title} {goals}".lower()
@@ -309,6 +329,8 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     # Scent modifiers
     for note in get_fragrance_notes(data.scent_note):
         apply_modifiers(nt, scent_map.get(note, {}))
+
+    scent_profile = build_scent_profile(data.scent_note)
 
     keywords = extract_keywords(data.productivity_limiters)
     for word in keywords:
@@ -490,6 +512,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "email_style_score": style_score,
         "name_email_aligned": alignment,
         "industry": industry,
+        "scent_profile": scent_profile,
         "scent_reinforcement": scent_reinforcement,
         "stressor_categories": classified_stressors,
         "olfactory_region_modeling": {
