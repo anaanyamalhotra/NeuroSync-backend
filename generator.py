@@ -135,9 +135,9 @@ def infer_ethnicity(name: str) -> str:
 
 def apply_cultural_modifiers(nt: Dict[str, float], email: str, name: str):
     region = infer_region(email)
-    work_env = infer_work_environment(data.email)
-    style_score = email_style_score(data.email)
-    alignment = verify_name_email_alignment(data.name, data.email)
+    work_env = infer_work_environment(email)
+    style_score = email_style_score(email)
+    alignment = verify_name_email_alignment(name, email)
     favored_scents = cultural_affinities.get(region, [])
     
     for scent in favored_scents:
