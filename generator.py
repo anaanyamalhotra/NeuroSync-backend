@@ -6,7 +6,7 @@ import requests
 import difflib
 import pandas as pd
 from ethnicolr import pred_fl_reg_name
-from generator import infer_life_stage
+
 
 # === Load fragrance notes JSON ===
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
