@@ -280,6 +280,27 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     # Scent modifiers
     for note in get_fragrance_notes(data.scent_note):
         apply_modifiers(nt, scent_map.get(note, {}))
+
+    keywords = extract_keywords(data.productivity_limiters)
+    for word in keywords:
+        if word.lower() in stress_map:
+            apply_modifiers(nt, stress_map[word.lower()])
+
+    if goals_sentiment is None:
+        goals_blob = TextBlob(data.career_goals)
+        goals_sentiment = goals_blob.sentiment.polarity
+
+    if stressors_sentiment is None:
+        stress_blob = TextBlob(data.productivity_limiters)
+        stressors_sentiment = stress_blob.sentiment.polarity
+
+    nt["dopamine"] += goals_sentiment * 0.04
+    nt["serotonin"] += goals_sentiment * 0.02
+    nt["cortisol"] += -stressors_sentiment * 0.05
+    nt["GABA"] += stressors_sentiment * 0.03
+
+    for k in nt:
+        nt[k] = round(min(1, max(0, nt[k])), 2)
     
     # Productivity limiter keywords
     for word in data.productivity_limiters.lower().split():
