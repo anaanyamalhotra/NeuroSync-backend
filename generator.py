@@ -93,6 +93,17 @@ def infer_ethnicity(name: str) -> str:
     except Exception:
         return "Uncategorized"
 
+def apply_cultural_modifiers(nt, email):
+    region = infer_region(email)
+    favored_scents = cultural_affinities.get(region, [])
+    
+    for scent in favored_scents:
+        modifiers = scent_map.get(scent.lower(), {})
+        for k, v in modifiers.items():
+            nt[k] = min(1.0, max(0.0, nt.get(k, 0.5) + v * 0.05))
+
+    return nt, region
+
 def get_fragrance_notes(scent: str):
     normalized = scent.lower().strip()
     if normalized in fragrance_db:
@@ -187,6 +198,7 @@ def generate_twin_vector(data: TwinRequest):
     # Clamp to [0, 1]
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
+        nt, region = apply_cultural_modifiers(nt, data.email)
 
     # Brain regions
     brain_regions = {
@@ -280,6 +292,7 @@ def generate_twin_vector(data: TwinRequest):
         "spotify_playlist": spotify_playlist,
         "age_range": age_range,
         "ethnicity": ethnicity,
+        "region": region,
         "scent_reinforcement": scent_reinforcement,
     }
 
