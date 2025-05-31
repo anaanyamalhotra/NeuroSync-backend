@@ -10,6 +10,9 @@ import requests
 import openai
 from generator import generate_twin_vector, infer_gender, apply_modifiers, extract_keywords
 import nltk
+from vector_store import add_twin
+from fastapi import Query
+from vector_store import load_metadata
 
 from textblob import download_corpora
 nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
@@ -141,6 +144,11 @@ async def generate(data: TwinRequest):
     try:
         print("== ✅ Request received at /generate ==")
         twin = generate_twin_vector(data)
+        add_twin(twin, twin["neurotransmitters"])
+
+        from vector_store import load_metadata  # already imported at the top
+
+        vector_id = len(load_metadata()) - 1
 
         print("DEBUG: Twin vector keys:", list(twin.keys()))
 
@@ -167,6 +175,7 @@ async def generate(data: TwinRequest):
             "twin_vector": twin,
             "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
             "brain_regions": twin.get("brain_regions", {}),
+            "vector_id": vector_id,
             "subvectors": twin.get("subvectors", {}),
             "scent_reinforcement": twin.get("scent_reinforcement", "lavender"),
             "lowest_region": twin.get("lowest_region", "")
@@ -253,3 +262,10 @@ Stay mindful and pace your energy today.
     except Exception as e:
         print("❌ GPT fallback triggered due to:", e)
         return {"journal_entry": local_fallback()}
+
+@app.get("/twins")
+def get_twin_by_id(vector_id: int):
+    metadata = load_metadata()
+    if 0 <= vector_id < len(metadata):
+        return metadata[vector_id]
+    raise HTTPException(status_code=404, detail="Twin not found.")
