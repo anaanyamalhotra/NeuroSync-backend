@@ -205,7 +205,7 @@ Stay mindful and pace your energy today.
         prompt = build_prompt()
 
         # Call GPT
-        response = openai.ChatCompletion.create(
+        res = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -219,7 +219,7 @@ Stay mindful and pace your energy today.
             ]
         )
 
-        journal = response.choices[0].message.content.strip()
+        journal = res.choices[0].message.content.strip()
 
         if not journal:
             raise ValueError("GPT returned empty response")
