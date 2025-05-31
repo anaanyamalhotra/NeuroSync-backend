@@ -149,7 +149,7 @@ async def generate(data: TwinRequest):
         }
         print("== ✅ Final Output ==", output)
         return output
-    from fastapi import HTTPException
+    
 
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
