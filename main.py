@@ -10,12 +10,23 @@ import requests
 import openai
 from generator import generate_twin_vector, infer_gender, apply_modifiers, extract_keywords
 import nltk
-from textblob import download_corpora
 
-try:
-    download_corpora.download_all()
-except Exception as e:
-    print("⚠️ Could not download corpora:", e)
+nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
+os.makedirs(nltk_data_path, exist_ok=True)
+nltk.data.path.append(nltk_data_path)
+required = [
+    "punkt",
+    "averaged_perceptron_tagger",
+    "wordnet",
+    "brown",
+    "movie_reviews"
+]
+
+for corpus in required:
+    try:
+        nltk.data.find(corpus)
+    except LookupError:
+        nltk.download(corpus, download_dir=nltk_data_path)
 # === INIT ===
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
