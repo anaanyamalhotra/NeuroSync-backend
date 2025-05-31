@@ -12,11 +12,13 @@ from generator import generate_twin_vector, infer_gender, apply_modifiers, extra
 import nltk
 
 from textblob import download_corpora
+nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
+os.environ["NLTK_DATA"] = nltk_data_path
+nltk.data.path.append(nltk_data_path)
+os.makedirs(nltk_data_path, exist_ok=True)
+
 download_corpora.download_all()
 
-nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
-os.makedirs(nltk_data_path, exist_ok=True)
-nltk.data.path.append(nltk_data_path)
 required = [
     "punkt",
     "averaged_perceptron_tagger",
@@ -30,6 +32,8 @@ for corpus in required:
         nltk.data.find(corpus)
     except LookupError:
         nltk.download(corpus, download_dir=nltk_data_path)
+
+
 # === INIT ===
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
