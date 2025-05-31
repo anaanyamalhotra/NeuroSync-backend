@@ -200,7 +200,7 @@ async def generate(data: TwinRequest):
             "stressors_sentiment": twin.get("stressors_sentiment", 0),
             "subvectors": twin.get("subvectors", {}),
             "scent_reinforcement": twin.get("scent_reinforcement", "lavender"),
-            "lowest_region": twin.get("lowest_region", "")
+            "lowest_region": twin.get("lowest_region", ""),
             "scent_profile": scent_profile,
         }
         print("== ✅ Final Output ==", output)
