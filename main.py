@@ -14,6 +14,7 @@ from vector_store import add_twin
 from fastapi import Query
 from vector_store import load_metadata
 from textblob import TextBlob
+from generator import infer_life_stage
 
 from textblob import download_corpora
 nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
