@@ -220,6 +220,12 @@ def generate_twin_vector(data: TwinRequest):
         game_mode = "team coordination"
         duration_minutes = 30
         switch_time = "every 15 mins"
+
+    required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
+    for key in required_keys:
+        if key not in output:
+            raise ValueError(f"[BUG] Missing key in generate_twin_vector output: {key}")
+    print("✅ FINAL OUTPUT from generate_twin_vector:", output)
         
     output = {
         "name": data.name,
