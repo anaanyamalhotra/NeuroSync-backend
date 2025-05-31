@@ -145,9 +145,9 @@ def match_game(favorite_scent, stressors_text, neurotransmitters):
 async def generate(data: TwinRequest):
     try:
         print("== ✅ Request received at /generate ==")
-        twin = generate_twin_vector(data)
         goals_sentiment = TextBlob(data.career_goals).sentiment.polarity
         stressors_sentiment = TextBlob(data.productivity_limiters).sentiment.polarity
+        twin = generate_twin_vector(data, goals_sentiment=goals_sentiment, stressors_sentiment=stressors_sentiment)
         print(f"📊 Sentiment — Goals: {goals_sentiment}, Stressors: {stressors_sentiment}")
 
         twin["goals_sentiment"] = goals_sentiment
