@@ -106,6 +106,20 @@ class ReflectRequest(BaseModel):
     switch_time: Optional[str] = None
 
 # === Utility ===
+def determine_cognitive_focus(subvectors):
+    if not subvectors:
+        return "general cognition"
+
+    dominant_region = max(subvectors, key=subvectors.get)
+    focus_map = {
+        "amygdala": "emotional AI",
+        "hippocampus": "memory/NLP",
+        "hypothalamus": "stress modeling",
+        "prefrontal_cortex": "decision AI",
+        "insula": "interoception AI"
+    }
+    return focus_map.get(dominant_region, "general cognition")
+    
 def get_fragrance_notes(scent):
     return fragrance_db.get(scent.lower().strip(), [])
 
@@ -183,6 +197,9 @@ async def generate(data: TwinRequest):
         twin["timestamp"] = datetime.utcnow().isoformat()
 
         print("== ✅ Final Output ==", twin)
+
+        twin["cognitive_focus"] = determine_cognitive_focus(twin.get("subvectors", {}))
+        
         output = {
             "status": "success",
             "neurotransmitters": twin.get("neurotransmitters", {}),
@@ -192,6 +209,7 @@ async def generate(data: TwinRequest):
             "switch_time": twin.get("switch_time", "After 20 mins"),
             "spotify_playlist": twin.get("spotify_playlist", "Focus Boost"),
             "match_reason": twin.get("match_reason", "No reason provided."),
+            "cognitive_focus": twin["cognitive_focus"],
             "twin_vector": twin,
             "memory_scent_profile": memory_scent_profile,
             "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
