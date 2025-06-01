@@ -4,6 +4,7 @@ import numpy as np
 import os
 import json
 import hashlib
+from datetime import datetime
 
 VECTOR_DIM = 5  # dopamine, serotonin, oxytocin, GABA, cortisol
 INDEX_PATH = "vector_store/faiss_index.index"
@@ -60,7 +61,7 @@ def add_twin(twin, vector=None):
         "life_stage": twin["life_stage"],
         "age_range": twin["age_range"],
         "ethnicity": twin["ethnicity"],
-        "timestamp": twin["timestamp"],
+        "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
         "vector_id": len(metadata),
         "user_id": user_id
     })
