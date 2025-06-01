@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 import difflib
 import pandas as pd
-
+from vector_store import load_metadata
 
 
 # === Load fragrance notes JSON ===
