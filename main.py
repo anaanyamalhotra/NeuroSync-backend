@@ -146,6 +146,8 @@ def match_game(favorite_scent, stressors_text, neurotransmitters):
     best_game = candidates[0]
 
     # === Step 3: Rationale for match ===
+    flat_neurotransmitters = {k: v for k, v in neurotransmitters.items() if isinstance(v, (float, int))}
+
     dominant_nt = max(neurotransmitters, key=neurotransmitters.get)
     rationale = (
         f"Matched with '{best_game['name']}' because its scent affinity with '{scent}' "
