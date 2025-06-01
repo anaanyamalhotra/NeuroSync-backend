@@ -297,6 +297,7 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 
 # === Vector Generation ===
 def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sentiment=None):
+    output = {}
     stress_categories = {
         "social": ["communication", "manager", "team", "conflict"],
         "workload": ["deadline", "overload", "multitasking", "burnout"],
