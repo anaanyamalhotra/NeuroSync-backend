@@ -16,7 +16,7 @@ from vector_store import add_twin
 from fastapi import Query
 import pandas as pd
 from generator import extract_memory_scent_profile
-from vector_store import load_metadata
+from vector_store import load_metadata, add_twin
 from textblob import TextBlob
 from generator import infer_life_stage_from_text
 
