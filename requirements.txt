@@ -10,6 +10,6 @@ python-dotenv
 nltk>=3.8
 faiss-cpu
 pandas
-tensorflow-cpu==2.15.0
-keras==2.15.0
-ethnicolr==0.9.0
+tensorflow
+keras
+ethnicolr
