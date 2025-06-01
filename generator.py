@@ -130,15 +130,15 @@ def infer_ethnicity(first_name, last_name):
         else:
             print("⚠️ ethnicolr returned unexpected type:", type(result))
             return "Unknown"
-    if "race" in result_df.columns:
-        return result_df.loc[0, "race"]
-    else:
-        print("⚠️ ethnicolr result missing 'race' column")
-        return "Unknown"
+        if "race" in result_df.columns:
+            return result_df.loc[0, "race"]
+        else:
+            print("⚠️ ethnicolr result missing 'race' column")
+            return "Unknown"
 
-except Exception as e:
-    print("❌ Ethnicity inference failed:", e)
-    return "Unknown"
+    except Exception as e:
+        print("❌ Ethnicity inference failed:", e)
+        return "Unknown"
 
 
 
