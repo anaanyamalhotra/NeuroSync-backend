@@ -332,13 +332,7 @@ Stay mindful and pace your energy today.
         return {"journal_entry": local_fallback()}
 
 @app.get("/twins")
-def get_twins(
-    gender: Optional[str] = None,
-    life_stage: Optional[str] = None,
-    age_range: Optional[str] = None,
-    user_id: Optional[str] = None,
-    limit: Optional[int] = None
-):
+def get_twins(...):
     try:
         metadata = load_metadata()
 
@@ -350,11 +344,14 @@ def get_twins(
             and (not user_id or m.get("user_id") == user_id)
         ]
 
+        # Defensive timestamp fallback
+        for r in results:
+            r["timestamp"] = r.get("timestamp", "unknown")
+
         if limit:
             results = results[:limit]
 
         return JSONResponse(content={"status": "success", "count": len(results), "twins": results})
-
     except Exception as e:
         print("❌ ERROR in /twins:", str(e))
         return JSONResponse(status_code=500, content={"status": "error", "detail": str(e)})
