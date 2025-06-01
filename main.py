@@ -203,17 +203,6 @@ async def generate(data: TwinRequest):
                 raise ValueError(f"❌ Key '{key}' missing from twin output")
 
         metadata = load_metadata()
-
-        metadata.append({
-            "name": twin.get("name", "unknown"),
-            "gender": twin.get("gender", "unspecified"),
-            "life_stage": twin.get("life_stage", "unknown"),
-            "age_range": twin.get("age_range", "unknown"),
-            "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
-            "vector_id": len(load_metadata()) - 1,
-            "user_id": user_id,
-            "ethnicity": twin.get("ethnicity", "Uncategorized")
-        })
                 
         add_twin(twin)
 
