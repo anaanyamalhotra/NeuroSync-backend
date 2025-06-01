@@ -120,37 +120,6 @@ def infer_age_range(job_title: str, goals: str) -> str:
         return "60+"
     return "25-40"
 
-def infer_ethnicity(first_name, last_name):
-    try:
-        df_input = pd.DataFrame({"first": [first_name], "last": [last_name]})
-        result = pred_fl_reg_name(df_input, "last", "first")
-        
-        if isinstance(result, dict):
-            print("⚠️ ethnicolr returned dict; converting to DataFrame")
-            result_df = pd.DataFrame(result)
-        elif isinstance(result, pd.DataFrame):
-            result_df = result
-        else:
-            print("⚠️ ethnicolr returned unexpected type:", type(result))
-            return "Unknown"
-        if result_df.empty:
-            print("⚠️ ethnicolr returned empty DataFrame")
-            return "Unknown"
-        if "race" not in result_df.columns:
-            print("⚠️ ethnicolr result missing 'race' column")
-            return "Unknown"
-        race_value = result_df.iloc[0].get("race", "Unknown")
-        if pd.isna(race_value):
-            print("⚠️ ethnicolr race value is NaN")
-            return "Unknown"
-        return race_value
-    except Exception as e:
-        print("❌ Ethnicity inference failed:", e)
-        return "Unknown"
-        
-
-
-
 def apply_cultural_modifiers(nt: Dict[str, float], email: str, name: str):
     region = infer_region(email)
     work_env = infer_work_environment(email)
@@ -361,7 +330,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     name_parts = data.name.strip().split()
     first_name = name_parts[0] if name_parts else ""
     last_name = name_parts[-1] if len(name_parts) > 1 else ""
-    ethnicity = infer_ethnicity(first_name, last_name)
     industry = infer_industry(data.job_title, data.company)
 
     # Scent modifiers
@@ -545,7 +513,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "switch_time": switch_time,
         "spotify_playlist": spotify_playlist,
         "age_range": age_range,
-        "ethnicity": ethnicity,
         "region": region,
         "work_env": work_env,
         "email_style_score": style_score,
