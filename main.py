@@ -112,8 +112,7 @@ def determine_cognitive_focus(subvectors):
     if not subvectors:
         return "general cognition"
 
-    region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
-    dominant_region = max(region_strengths, key=region_strengths.get)
+    dominant_region = max(subvectors, key=lambda region: sum(subvectors[region].values()))
     focus_map = {
         "amygdala": "emotional AI",
         "hippocampus": "memory/NLP",
