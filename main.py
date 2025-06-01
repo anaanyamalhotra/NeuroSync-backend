@@ -180,7 +180,7 @@ async def generate(data: TwinRequest):
         if stressors_sentiment < -0.3:
             twin["neurotransmitters"]["cortisol"] = min(1, twin["neurotransmitters"].get("cortisol", 0.5) + 0.1)
             twin["neurotransmitters"]["GABA"] = max(0, twin["neurotransmitters"].get("GABA", 0.5) - 0.05)
-        add_twin([twin], twin["neurotransmitters"])
+        add_twin(twin)
 
         from vector_store import load_metadata  # already imported at the top
 
