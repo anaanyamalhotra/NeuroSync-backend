@@ -343,7 +343,10 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
 
     life_stage = infer_life_stage_from_text(data.job_title, data.career_goals)
     age_range = infer_age_range(data.job_title, data.career_goals)
-    ethnicity = infer_ethnicity(data.name)
+    name_parts = data.name.strip().split()
+    first_name = name_parts[0] if name_parts else ""
+    last_name = name_parts[-1] if len(name_parts) > 1 else ""
+    ethnicity = infer_ethnicity(first_name, last_name)
     industry = infer_industry(data.job_title, data.company)
 
     # Scent modifiers
