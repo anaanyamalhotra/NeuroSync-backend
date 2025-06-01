@@ -220,7 +220,7 @@ async def generate(data: TwinRequest):
             "cognitive_focus": twin["cognitive_focus"],
             "twin_vector": twin,
             "memory_scent_profile": memory_scent_profile,
-            "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
+            "timestamp": datetime.utcnow().isoformat(), 
             "brain_regions": twin.get("brain_regions", {}),
             "vector_id": vector_id,
             "goals_sentiment": twin.get("goals_sentiment", 0),
