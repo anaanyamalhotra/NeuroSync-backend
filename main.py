@@ -202,6 +202,8 @@ async def generate(data: TwinRequest):
             if key not in twin:
                 raise ValueError(f"❌ Key '{key}' missing from twin output")
 
+        metadata = load_metadata()
+
         metadata.append({
             "name": twin.get("name", "unknown"),
             "gender": twin.get("gender", "unspecified"),
