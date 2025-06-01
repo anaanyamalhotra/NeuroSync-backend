@@ -438,6 +438,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     }
 
     dominant_region = max(brain_regions.items(), key=lambda x: x[1])[0]
+    output["brain_regions"] = brain_regions
     output["dominant_region"] = dominant_region
 
     lowest_region = min(brain_regions, key=brain_regions.get)
