@@ -262,7 +262,7 @@ def determine_cognitive_focus(subvectors: Dict[str, float]) -> Dict[str, str]:
         "prefrontal_cortex": "🧠 Strategic Thinker"
     }
     return {
-        "label": focus_map.get(dominant_region, "⚖️ Cognitive Synthesizer"),
+        "label": label_map.get(dominant_region, "⚖️ Cognitive Synthesizer"),
         "region": dominant_region,
         "confidence": confidence
     }
