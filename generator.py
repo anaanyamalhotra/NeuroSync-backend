@@ -127,8 +127,11 @@ def infer_ethnicity(name: str) -> str:
     df = pd.DataFrame({"first": [first_name], "last": [last_name]})
     try:
         df = pred_fl_reg_name(df, "last", "first")
-        race = df.loc[0, "race"]
 
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError("ethnicolr did not return a DataFrame")
+
+        race = df.loc[0, "race"]
         ethnicity_map = {
             "api": "East Asian",
             "black": "Black",
@@ -138,7 +141,8 @@ def infer_ethnicity(name: str) -> str:
         }
 
         return ethnicity_map.get(race, "Uncategorized")
-    except Exception:
+    except Exception as e:
+        print(f"[ethnicity inference failed]: {e}")
         return "Uncategorized"
 
 def apply_cultural_modifiers(nt: Dict[str, float], email: str, name: str):
