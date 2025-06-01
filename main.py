@@ -203,6 +203,7 @@ async def generate(data: TwinRequest):
                 raise ValueError(f"❌ Key '{key}' missing from twin output")
 
         metadata = load_metadata()
+        vector_id = len(metadata)
                 
         add_twin(twin)
 
@@ -345,7 +346,7 @@ def get_twins(
 ):
     try:
         metadata = load_metadata()
-        vector_id = len(metadata)
+        
 
         results = [
             m for m in metadata
