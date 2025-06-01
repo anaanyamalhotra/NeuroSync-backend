@@ -249,6 +249,17 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
     for k, v in modifiers.items():
         base[k] = base.get(k, 0.5) + v
 
+def determine_cognitive_focus(subvectors):
+    region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
+    dominant_region = max(region_strengths, key=region_strengths.get)
+    focus_map = {
+        "amygdala": "Emotional AI",
+        "hippocampus": "Memory-Augmented NLP",
+        "hypothalamus": "Adaptive Stress Interfaces",
+        "prefrontal_cortex": "Cognitive Planning Systems"
+    }
+    return focus_map.get(dominant_region, "General Cognitive Modeling")
+
 from textblob import TextBlob
 
 def extract_keywords(text: str) -> List[str]:
@@ -535,18 +546,9 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
             raise ValueError(f"[BUG] Missing key in generate_twin_vector output: {key}")
 
     print("✅ FINAL OUTPUT from generate_twin_vector:", output)
-
-    def determine_cognitive_focus(subvectors):
-        region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
-        dominant_region = max(region_strengths, key=region_strengths.get)
-        focus_map = {
-            "amygdala": "Emotional AI",
-            "hippocampus": "Memory-Augmented NLP",
-            "hypothalamus": "Adaptive Stress Interfaces",
-            "prefrontal_cortex": "Cognitive Planning Systems"
-        }
-        return focus_map.get(dominant_region, "General Cognitive Modeling")
     output["cognitive_focus"] = determine_cognitive_focus(subvectors)
+
+
 
 
     log_journal_entry(data, output)
