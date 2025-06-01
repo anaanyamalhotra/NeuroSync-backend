@@ -354,7 +354,8 @@ def get_twins(
 
         # Defensive timestamp fallback
         for r in results:
-            r.setdefault("timestamp", "unknown")
+            if "timestamp" not in r:
+                r["timestamp"] = "unknown"
 
         if limit:
             results = results[:limit]
