@@ -542,6 +542,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "industry": industry,
         "memory_scent_profile": memory_scent_profile,
         "scent_profile": scent_profile,
+        "dominant region": dominant_region
         "scent_reinforcement": scent_reinforcement,
         "stressor_categories": classified_stressors,
         "olfactory_region_modeling": {
@@ -553,7 +554,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     focus_result = determine_cognitive_focus(subvectors)
     output["cognitive_focus"] = focus_result["label"]
     output["cognitive_focus_confidence"] = focus_result["confidence"]
-    output["dominant_region"] = focus_result["region"]
+    
 
     required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
     for key in required_keys:
