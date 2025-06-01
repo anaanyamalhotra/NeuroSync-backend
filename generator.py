@@ -520,6 +520,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "reflection_tags": [data.job_title, data.productivity_limiters, data.scent_note],
         "xbox_game": xbox_game,
         "game_mode": game_mode,
+        "vector_id": len(load_metadata()) - 1,
         "duration_minutes": duration_minutes,
         "switch_time": switch_time,
         "spotify_playlist": spotify_playlist,
