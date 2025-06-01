@@ -250,7 +250,7 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
         base[k] = base.get(k, 0.5) + v
 
 def determine_cognitive_focus(subvectors: Dict[str, float]) -> Dict[str, str]:
-    region_strengths = {k: sum(v) if isinstance(v, list) else v for k, v in subvectors.items()}
+    region_strengths = {k: sum(v.values()) if isinstance(v, dict) else v for k, v in subvectors.items()}
     if not region_strengths:
         return {"label": "⚖️ Cognitive Synthesizer", "confidence": 50, "region": "unknown"}
     dominant_region = max(region_strengths, key=region_strengths.get)
