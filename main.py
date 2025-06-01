@@ -112,7 +112,8 @@ def determine_cognitive_focus(subvectors):
     if not subvectors:
         return "general cognition"
 
-    dominant_region = max(subvectors, key=subvectors.get)
+    region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
+    dominant_region = max(region_strengths, key=region_strengths.get)
     focus_map = {
         "amygdala": "emotional AI",
         "hippocampus": "memory/NLP",
@@ -121,6 +122,8 @@ def determine_cognitive_focus(subvectors):
         "insula": "interoception AI"
     }
     return focus_map.get(dominant_region, "general cognition")
+
+
     
 def get_fragrance_notes(scent):
     return fragrance_db.get(scent.lower().strip(), [])
