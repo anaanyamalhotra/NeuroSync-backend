@@ -27,9 +27,13 @@ def load_metadata():
     if os.path.exists(META_PATH):
         with open(META_PATH, "r") as f:
             metadata = json.load(f)
+        updated = False
         for entry in metadata:
             if "timestamp" not in entry:
                 entry["timestamp"] = datetime.utcnow().isoformat()
+                updated = True
+        if updated:
+            save_metadata(metadata)
         return metadata
     return []
 
