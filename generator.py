@@ -437,6 +437,9 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "hypothalamus": round((nt["GABA"] * 0.5 + nt["cortisol"] * 0.5), 2)
     }
 
+    dominant_region = max(brain_regions.items(), key=lambda x: x[1])[0]
+    output["dominant_region"] = dominant_region
+
     lowest_region = min(brain_regions, key=brain_regions.get)
     region_scent_suggestions = {
         "amygdala": "lavender or rose for emotional grounding",
