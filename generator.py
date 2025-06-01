@@ -1,4 +1,4 @@
-    
+
 
 from pydantic import BaseModel
 from typing import List, Optional, Dict
@@ -249,23 +249,16 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
     for k, v in modifiers.items():
         base[k] = base.get(k, 0.5) + v
 
-def determine_cognitive_focus(subvectors: Dict[str, float]) -> Dict[str, str]:
-    region_strengths = {k: sum(v.values()) if isinstance(v, dict) else v for k, v in subvectors.items()}
-    if not region_strengths:
-        return {"label": "⚖️ Cognitive Synthesizer", "confidence": 50, "region": "unknown"}
+def determine_cognitive_focus(subvectors):
+    region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
     dominant_region = max(region_strengths, key=region_strengths.get)
-    confidence = round(region_strengths[dominant_region] / sum(region_strengths.values()) * 100)
-    label_map = {
-        "amygdala": "💓 Emotional Analyst",
-        "hippocampus": "📚 Memory-Oriented Thinker",
-        "hypothalamus": "🧘‍♀️ Stress Regulator",
-        "prefrontal_cortex": "🧠 Strategic Thinker"
+    focus_map = {
+        "amygdala": "Emotional AI",
+        "hippocampus": "Memory-Augmented NLP",
+        "hypothalamus": "Adaptive Stress Interfaces",
+        "prefrontal_cortex": "Cognitive Planning Systems"
     }
-    return {
-        "label": label_map.get(dominant_region, "⚖️ Cognitive Synthesizer"),
-        "region": dominant_region,
-        "confidence": confidence
-    }
+    return focus_map.get(dominant_region, "General Cognitive Modeling")
 
 from textblob import TextBlob
 
@@ -297,7 +290,6 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 
 # === Vector Generation ===
 def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sentiment=None):
-    
     stress_categories = {
         "social": ["communication", "manager", "team", "conflict"],
         "workload": ["deadline", "overload", "multitasking", "burnout"],
@@ -438,8 +430,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "hypothalamus": round((nt["GABA"] * 0.5 + nt["cortisol"] * 0.5), 2)
     }
 
-    
-
     lowest_region = min(brain_regions, key=brain_regions.get)
     region_scent_suggestions = {
         "amygdala": "lavender or rose for emotional grounding",
@@ -542,7 +532,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "industry": industry,
         "memory_scent_profile": memory_scent_profile,
         "scent_profile": scent_profile,
-        
         "scent_reinforcement": scent_reinforcement,
         "stressor_categories": classified_stressors,
         "olfactory_region_modeling": {
@@ -551,10 +540,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         
         }
         }
-    focus_result = determine_cognitive_focus(subvectors)
-    output["cognitive_focus"] = focus_result["label"]
-    output["cognitive_focus_confidence"] = focus_result["confidence"]
-    
 
     required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
     for key in required_keys:
@@ -562,6 +547,10 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
             raise ValueError(f"[BUG] Missing key in generate_twin_vector output: {key}")
 
     print("✅ FINAL OUTPUT from generate_twin_vector:", output)
- 
+    output["cognitive_focus"] = determine_cognitive_focus(subvectors)
+
+
+
+
     log_journal_entry(data, output)
     return output
