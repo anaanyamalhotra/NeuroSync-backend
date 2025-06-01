@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 import difflib
 import pandas as pd
-from ethnicolr import pred_fl_reg_name
+
 
 
 # === Load fragrance notes JSON ===
