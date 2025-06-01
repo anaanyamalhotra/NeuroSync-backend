@@ -29,7 +29,7 @@ def load_metadata():
             metadata = json.load(f)
         for entry in metadata:
             if "timestamp" not in entry:
-                entry["timestamp"] = "unknown" 
+                entry["timestamp"] = datetime.utcnow().isoformat()
         return metadata
     return []
 
