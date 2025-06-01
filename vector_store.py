@@ -25,7 +25,11 @@ def save_index(index):
 def load_metadata():
     if os.path.exists(META_PATH):
         with open(META_PATH, "r") as f:
-            return json.load(f)
+            metadata = json.load(f)
+        for entry in metadata:
+            if "timestamp" not in entry:
+                entry["timestamp"] = "unknown" 
+        return metadata
     return []
 
 # === Save metadata ===
