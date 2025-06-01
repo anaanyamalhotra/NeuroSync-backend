@@ -528,6 +528,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "vector_id": len(load_metadata()) - 1,
         "duration_minutes": duration_minutes,
         "switch_time": switch_time,
+        "dominant_region": dominant_region
         "spotify_playlist": spotify_playlist,
         "age_range": age_range,
         "region": region,
