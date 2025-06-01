@@ -193,14 +193,15 @@ async def generate(data: TwinRequest):
         print("DEBUG: Twin vector keys:", list(twin.keys()))
 
         # Defensive check
+        game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
+        twin.update(game)
+        twin["timestamp"] = datetime.utcnow().isoformat()
+
         required_keys = ["neurotransmitters", "xbox_game"]
         for key in required_keys:
             if key not in twin:
                 raise ValueError(f"❌ Key '{key}' missing from twin output")
-
-        game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
-        twin.update(game)
-        twin["timestamp"] = datetime.utcnow().isoformat()
+                
         add_twin(twin)
 
         print("== ✅ Final Output ==", twin)
