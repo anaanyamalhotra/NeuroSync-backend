@@ -184,7 +184,7 @@ async def generate(data: TwinRequest):
         if stressors_sentiment < -0.3:
             twin["neurotransmitters"]["cortisol"] = min(1, twin["neurotransmitters"].get("cortisol", 0.5) + 0.1)
             twin["neurotransmitters"]["GABA"] = max(0, twin["neurotransmitters"].get("GABA", 0.5) - 0.05)
-        add_twin(twin)
+       
 
         from vector_store import load_metadata  # already imported at the top
 
@@ -201,6 +201,7 @@ async def generate(data: TwinRequest):
         game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
         twin.update(game)
         twin["timestamp"] = datetime.utcnow().isoformat()
+        add_twin(twin)
 
         print("== ✅ Final Output ==", twin)
 
