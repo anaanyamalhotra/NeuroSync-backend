@@ -249,11 +249,13 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
     for k, v in modifiers.items():
         base[k] = base.get(k, 0.5) + v
 
-def determine_cognitive_focus(subvectors):
-    region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
+def determine_cognitive_focus(subvectors: Dict[str, float]) -> Dict[str, str]:
+    region_strengths = {k: sum(v) if isinstance(v, list) else v for k, v in subvectors.items()}
+    if not region_strengths:
+        return {"label": "⚖️ Cognitive Synthesizer", "confidence": 50, "region": "unknown"}
     dominant_region = max(region_strengths, key=region_strengths.get)
     confidence = round(region_strengths[dominant_region] / sum(region_strengths.values()) * 100)
-    focus_map = {
+    label_map = {
         "amygdala": "💓 Emotional Analyst",
         "hippocampus": "📚 Memory-Oriented Thinker",
         "hypothalamus": "🧘‍♀️ Stress Regulator",
