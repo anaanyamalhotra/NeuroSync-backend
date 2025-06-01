@@ -210,7 +210,7 @@ async def generate(data: TwinRequest):
             "life_stage": twin.get("life_stage", "unknown"),
             "age_range": twin.get("age_range", "unknown"),
             "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
-            "vector_id": len(metadata),
+            "vector_id": len(load_metadata()) - 1,
             "user_id": user_id,
             "ethnicity": twin.get("ethnicity", "Uncategorized")
         })
