@@ -19,6 +19,8 @@ from vector_store import load_metadata
 from textblob import TextBlob
 from generator import infer_life_stage_from_text
 
+df = pd.DataFrame([my_dict]) 
+
 from textblob import download_corpora
 nltk_data_path = os.path.join(os.path.dirname(__file__), "nltk_data")
 os.environ["NLTK_DATA"] = nltk_data_path
