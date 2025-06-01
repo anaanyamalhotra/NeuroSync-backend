@@ -542,7 +542,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         "industry": industry,
         "memory_scent_profile": memory_scent_profile,
         "scent_profile": scent_profile,
-        "dominant region": dominant_region,
+        
         "scent_reinforcement": scent_reinforcement,
         "stressor_categories": classified_stressors,
         "olfactory_region_modeling": {
