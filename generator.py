@@ -118,32 +118,23 @@ def infer_age_range(job_title: str, goals: str) -> str:
         return "60+"
     return "25-40"
 
-def infer_ethnicity(name: str) -> str:
-    parts = name.strip().split()
-    if len(parts) < 2:
-        return "Uncategorized"
-    
-    first_name, last_name = parts[0], parts[-1]
-    df = pd.DataFrame({"first": [first_name], "last": [last_name]})
+def infer_ethnicity(first_name, last_name):
     try:
+        df = pd.DataFrame({"first": [first_name], "last": [last_name]})
         df = pred_fl_reg_name(df, "last", "first")
-
         if not isinstance(df, pd.DataFrame):
-            raise ValueError("ethnicolr did not return a DataFrame")
-
-        race = df.loc[0, "race"]
-        ethnicity_map = {
-            "api": "East Asian",
-            "black": "Black",
-            "hispanic": "Latinx",
-            "white": "Western",
-            "other": "Other"
-        }
-
-        return ethnicity_map.get(race, "Uncategorized")
+            print("⚠️ ethnicolr returned unexpected type:", type(df))
+            return "Unknown"
+        if "race" in df.columns:
+            return df.loc[0, "race"]
+        else:
+            print("⚠️ ethnicolr did not return 'race' column")
+            return "Unknown"
     except Exception as e:
-        print(f"[ethnicity inference failed]: {e}")
-        return "Uncategorized"
+        print("❌ Ethnicity inference failed:", e)
+        return "Unknown"
+
+
 
 def apply_cultural_modifiers(nt: Dict[str, float], email: str, name: str):
     region = infer_region(email)
