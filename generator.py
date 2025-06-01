@@ -124,6 +124,7 @@ def infer_ethnicity(first_name, last_name):
     try:
         df_input = pd.DataFrame({"first": [first_name], "last": [last_name]})
         result = pred_fl_reg_name(df_input, "last", "first")
+        
         if isinstance(result, dict):
             print("⚠️ ethnicolr returned dict; converting to DataFrame")
             result_df = pd.DataFrame(result)
@@ -132,16 +133,21 @@ def infer_ethnicity(first_name, last_name):
         else:
             print("⚠️ ethnicolr returned unexpected type:", type(result))
             return "Unknown"
-        if "race" in result_df.columns:
-            return result_df.loc[0, "race"]
-        else:
+        if result_df.empty:
+            print("⚠️ ethnicolr returned empty DataFrame")
+            return "Unknown"
+        if "race" not in result_df.columns:
             print("⚠️ ethnicolr result missing 'race' column")
             return "Unknown"
-
+        race_value = result_df.iloc[0].get("race", "Unknown")
+        if pd.isna(race_value):
+            print("⚠️ ethnicolr race value is NaN")
+            return "Unknown"
+        return race_value
     except Exception as e:
         print("❌ Ethnicity inference failed:", e)
         return "Unknown"
-
+        
 
 
 
