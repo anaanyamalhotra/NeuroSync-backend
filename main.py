@@ -332,7 +332,13 @@ Stay mindful and pace your energy today.
         return {"journal_entry": local_fallback()}
 
 @app.get("/twins")
-def get_twins(...):
+def get_twins(
+    gender: Optional[str] = Query(None),
+    life_stage: Optional[str] = Query(None),
+    age_range: Optional[str] = Query(None),
+    user_id: Optional[str] = Query(None),
+    limit: Optional[int] = Query(None)
+):
     try:
         metadata = load_metadata()
 
