@@ -186,7 +186,7 @@ async def generate(data: TwinRequest):
             twin["neurotransmitters"]["GABA"] = max(0, twin["neurotransmitters"].get("GABA", 0.5) - 0.05)
        
 
-        from vector_store import load_metadata  # already imported at the top
+       
 
         
 
