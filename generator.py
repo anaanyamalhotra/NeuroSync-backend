@@ -120,19 +120,26 @@ def infer_age_range(job_title: str, goals: str) -> str:
 
 def infer_ethnicity(first_name, last_name):
     try:
-        df = pd.DataFrame({"first": [first_name], "last": [last_name]})
-        df = pred_fl_reg_name(df, "last", "first")
-        if not isinstance(df, pd.DataFrame):
-            print("⚠️ ethnicolr returned unexpected type:", type(df))
-            return "Unknown"
-        if "race" in df.columns:
-            return df.loc[0, "race"]
+        df_input = pd.DataFrame({"first": [first_name], "last": [last_name]})
+        result = pred_fl_reg_name(df_input, "last", "first")
+        if isinstance(result, dict):
+            print("⚠️ ethnicolr returned dict; converting to DataFrame")
+            result_df = pd.DataFrame(result)
+        elif isinstance(result, pd.DataFrame):
+            result_df = result
         else:
-            print("⚠️ ethnicolr did not return 'race' column")
+            print("⚠️ ethnicolr returned unexpected type:", type(result))
             return "Unknown"
-    except Exception as e:
-        print("❌ Ethnicity inference failed:", e)
+    if "race" in result_df.columns:
+        return result_df.loc[0, "race"]
+    else:
+        print("⚠️ ethnicolr result missing 'race' column")
         return "Unknown"
+
+except Exception as e:
+    print("❌ Ethnicity inference failed:", e)
+    return "Unknown"
+
 
 
 
