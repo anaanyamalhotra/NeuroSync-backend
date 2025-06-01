@@ -60,7 +60,6 @@ def add_twin(twin, vector=None):
         "gender": twin["gender"],
         "life_stage": twin["life_stage"],
         "age_range": twin["age_range"],
-        "ethnicity": twin["ethnicity"],
         "timestamp": twin.get("timestamp", datetime.utcnow().isoformat()),
         "vector_id": len(metadata),
         "user_id": user_id
