@@ -345,6 +345,7 @@ def get_twins(
 ):
     try:
         metadata = load_metadata()
+        vector_id = len(metadata)
 
         results = [
             m for m in metadata
