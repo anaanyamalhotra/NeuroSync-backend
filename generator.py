@@ -252,13 +252,18 @@ def apply_modifiers(base: Dict[str, float], modifiers: Dict[str, float]):
 def determine_cognitive_focus(subvectors):
     region_strengths = {region: sum(values.values()) for region, values in subvectors.items()}
     dominant_region = max(region_strengths, key=region_strengths.get)
+    confidence = round(region_strengths[dominant_region] / sum(region_strengths.values()) * 100)
     focus_map = {
-        "amygdala": "Emotional AI",
-        "hippocampus": "Memory-Augmented NLP",
-        "hypothalamus": "Adaptive Stress Interfaces",
-        "prefrontal_cortex": "Cognitive Planning Systems"
+        "amygdala": "💓 Emotional Analyst",
+        "hippocampus": "📚 Memory-Oriented Thinker",
+        "hypothalamus": "🧘‍♀️ Stress Regulator",
+        "prefrontal_cortex": "🧠 Strategic Thinker"
     }
-    return focus_map.get(dominant_region, "General Cognitive Modeling")
+    return {
+        "label": focus_map.get(dominant_region, "⚖️ Cognitive Synthesizer"),
+        "region": dominant_region,
+        "confidence": confidence
+    }
 
 from textblob import TextBlob
 
@@ -540,6 +545,10 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
         
         }
         }
+    focus_result = determine_cognitive_focus(subvectors)
+    output["cognitive_focus"] = focus_result["label"]
+    output["cognitive_focus_confidence"] = focus_result["confidence"]
+    output["dominant_region"] = focus_result["region"]
 
     required_keys = ["neurotransmitters", "xbox_game", "game_mode", "duration_minutes", "switch_time", "spotify_playlist"]
     for key in required_keys:
@@ -547,10 +556,6 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
             raise ValueError(f"[BUG] Missing key in generate_twin_vector output: {key}")
 
     print("✅ FINAL OUTPUT from generate_twin_vector:", output)
-    output["cognitive_focus"] = determine_cognitive_focus(subvectors)
-
-
-
-
+ 
     log_journal_entry(data, output)
     return output
