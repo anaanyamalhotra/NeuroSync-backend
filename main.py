@@ -188,7 +188,7 @@ async def generate(data: TwinRequest):
 
         from vector_store import load_metadata  # already imported at the top
 
-        vector_id = len(load_metadata()) - 1
+        
 
         print("DEBUG: Twin vector keys:", list(twin.keys()))
 
