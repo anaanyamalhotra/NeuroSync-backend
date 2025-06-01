@@ -223,7 +223,7 @@ async def generate(data: TwinRequest):
             "scent_profile": scent_profile,
         }
         print("== ✅ Final Output ==", output)
-        return output
+        return JSONResponse(content=json.loads(json.dumps(output, default=str)))
     
 
     except Exception as e:
