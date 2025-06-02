@@ -10,14 +10,14 @@ import pandas as pd
 from vector_store import load_metadata
 
 
-# === Load fragrance notes JSON ===
+
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
 with open(os.path.join(os.path.dirname(__file__), "cultural_affinities.json"), "r") as f:
     cultural_affinities = json.load(f)
 
-# === Scent and Stress Maps ===
+
 scent_map = {
     "lavender": {"GABA": 0.15, "cortisol": -0.1},
     "vanilla": {"oxytocin": 0.1, "dopamine": 0.05},   
@@ -50,7 +50,7 @@ stress_map = {
     "conflict": {"cortisol": 0.3, "oxytocin": -0.15}     
 }
 
-# === Input Model (Packet-Based) ===
+
 class TwinRequest(BaseModel):
     name: str
     email: str
@@ -62,7 +62,7 @@ class TwinRequest(BaseModel):
     childhood_scent: str
     assigned_sex: Optional[str] = "unspecified"
 
-# === Helper Functions ===
+
 def infer_gender(name):
     try:
         res = requests.get(f"https://api.genderize.io?name={name.split()[0]}")
@@ -191,7 +191,7 @@ def extract_memory_scent_profile(childhood_memory: str, fragrance_db, scent_map)
             if word in base_note or base_note in word:
                 extracted_notes.append(base_note)
 
-    extracted_notes = list(set(extracted_notes))  # Deduplicate
+    extracted_notes = list(set(extracted_notes))  
 
     neurotransmitter_map = {}
     for note in extracted_notes:
@@ -288,7 +288,7 @@ Suggested Playlist: {output.get('spotify_playlist', 'N/A')}
 -------------------------
 """)
 
-# === Vector Generation ===
+
 def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sentiment=None):
     stress_categories = {
         "social": ["communication", "manager", "team", "conflict"],
@@ -303,8 +303,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
                 classified_stressors[category].append(word.lower())
     
     
-    # Random baselines
-    
+   
     baseline_nt = {
         "dopamine": 0.55,
         "serotonin": 0.60,
@@ -343,7 +342,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     last_name = name_parts[-1] if len(name_parts) > 1 else ""
     industry = infer_industry(data.job_title, data.company)
 
-    # Scent modifiers
+  
     for note in get_fragrance_notes(data.scent_note):
         apply_modifiers(nt, scent_map.get(note, {}))
 
@@ -383,7 +382,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     nt["hippocampus_memory_boost"] = round(memory_sentiment * 0.02, 3)
     memory_scent_profile = extract_memory_scent_profile(data.childhood_scent, fragrance_db, scent_map)
     
-    # Clamp to [0, 1]
+   
     for k in nt:
         nt[k] = round(min(1, max(0, nt[k])), 2)
     nt, region, work_env, style_score, alignment = apply_cultural_modifiers(nt, data.email, data.name)
@@ -422,7 +421,7 @@ def generate_twin_vector(data: TwinRequest, goals_sentiment=None, stressors_sent
     if alignment:
         nt["oxytocin"] = min(1, nt.get("oxytocin", 0.5) + 0.03)
 
-    # Brain regions
+
     brain_regions = {
         "amygdala": round((nt["cortisol"] * 0.6 + nt["oxytocin"] * 0.4), 2),
         "prefrontal_cortex": round((nt["dopamine"] * 0.5 + nt["serotonin"] * 0.5), 2),
