@@ -1,4 +1,4 @@
-# Prevent sensitive and unnecessary files from being tracked
+
 .env
 __pycache__/
 *.pyc
