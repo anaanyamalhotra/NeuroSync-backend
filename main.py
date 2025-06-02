@@ -342,7 +342,7 @@ def get_twins(
     life_stage: Optional[str] = Query(None),
     age_range: Optional[str] = Query(None),
     user_id: Optional[str] = Query(None),
-    ethnicity: Optional[str] = Query(None),
+    
     limit: Optional[int] = Query(None)
 ):
     try:
@@ -354,7 +354,7 @@ def get_twins(
             if (not gender or m.get("gender") == gender)
             and (not life_stage or m.get("life_stage") == life_stage)
             and (not age_range or m.get("age_range") == age_range)
-            and (not ethnicity or m.get("ethnicity") == ethnicity) 
+            and (not top_neurotransmitters or m.get("top_neurotransmitters") == top_neurotransmitters
             and (not user_id or m.get("user_id") == user_id)
         ]
 
