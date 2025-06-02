@@ -267,7 +267,6 @@ def extract_keywords(text: str) -> List[str]:
     blob = TextBlob(text)
     return [word for word, tag in blob.tags if tag.startswith("NN")]
 
-# === Journal Logging ===
 def log_journal_entry(data: TwinRequest, output: dict):
     log_dir = "journal_logs"
     os.makedirs(log_dir, exist_ok=True)
