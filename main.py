@@ -44,7 +44,7 @@ for corpus in required:
         nltk.download(corpus, download_dir=nltk_data_path)
 
 
-# === INIT ===
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app = FastAPI()
 
@@ -56,14 +56,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Load static data ===
+
 with open(os.path.join(os.path.dirname(__file__), "fragrance_notes.json"), "r") as f:
     fragrance_db = json.load(f)
 
 with open(os.path.join(os.path.dirname(__file__), "game_profiles.json"), "r") as f:
     game_profiles = json.load(f)
 
-# === Scent + Stress Maps ===
+
 scent_map = {
     "lavender": {"GABA": 0.1},
     "vanilla": {"oxytocin": 0.1},
@@ -84,7 +84,7 @@ stress_map = {
     "overwhelmed": {"cortisol": 0.25, "GABA": -0.15}
 }
 
-# === Data models ===
+
 class TwinRequest(BaseModel):
     name: str
     email: str
@@ -107,7 +107,7 @@ class ReflectRequest(BaseModel):
     duration_minutes: Optional[int] = None
     switch_time: Optional[str] = None
 
-# === Utility ===
+
 def determine_cognitive_focus(subvectors):
     if not subvectors:
         return "general cognition"
@@ -131,12 +131,12 @@ def match_game(favorite_scent, stressors_text, neurotransmitters):
     scent = favorite_scent.lower().strip()
     stress_keywords = extract_keywords(stressors_text)
 
-    # === Step 1: Filter games that have scent affinity ===
+    
     candidates = [g for g in game_profiles if scent in g.get("scent_affinity", {})]
     if not candidates:
-        candidates = game_profiles  # fallback to all
+        candidates = game_profiles  
 
-    # === Step 2: Score games based on scent strength and NT alignment ===
+    
     def score_game(game):
         scent_score = game["scent_affinity"].get(scent, 0)
         nt_score = sum(neurotransmitters.get(tag, 0.5) for tag in game.get("tags", [])) / len(game.get("tags", []) or [1])
@@ -145,7 +145,7 @@ def match_game(favorite_scent, stressors_text, neurotransmitters):
     candidates.sort(key=score_game, reverse=True)
     best_game = candidates[0]
 
-    # === Step 3: Rationale for match ===
+    
     flat_neurotransmitters = {k: v for k, v in neurotransmitters.items() if isinstance(v, (float, int))}
 
     dominant_nt = max(neurotransmitters, key=neurotransmitters.get)
@@ -164,7 +164,7 @@ def match_game(favorite_scent, stressors_text, neurotransmitters):
         "match_reason": rationale
     }
 
-# === API ROUTES ===
+
 @app.post("/generate")
 async def generate(data: TwinRequest):
     try:
@@ -192,7 +192,7 @@ async def generate(data: TwinRequest):
 
         print("DEBUG: Twin vector keys:", list(twin.keys()))
 
-        # Defensive check
+        
         game = match_game(data.scent_note, data.productivity_limiters, twin["neurotransmitters"])
         twin.update(game)
         twin["timestamp"] = datetime.utcnow().isoformat()
@@ -240,7 +240,7 @@ async def generate(data: TwinRequest):
     except Exception as e:
         print("❌ ERROR in /generate:", str(e))
         raise HTTPException(status_code=500, detail=f"Internal Error: {e}")
-        # Explicit status to help Streamlit know this is an error
+        
         
 @app.post("/reflect")
 async def reflect(data: ReflectRequest):
@@ -275,7 +275,7 @@ Your brain chemistry suggests:
 Stay mindful and pace your energy today.
 """
 
-        # Build GPT prompt
+        
         def build_prompt():
             insights = analyze_neuro(data.neurotransmitters or {})
             joined_insights = "\n".join(insights)
@@ -310,7 +310,7 @@ Stay mindful and pace your energy today.
 
         prompt = build_prompt()
 
-        # Call GPT
+        
         res = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -358,7 +358,7 @@ def get_twins(
             and (not user_id or m.get("user_id") == user_id)
         ]
 
-        # Defensive timestamp fallback
+        
         for r in results:
             if "timestamp" not in r:
                 r["timestamp"] = "unknown"
