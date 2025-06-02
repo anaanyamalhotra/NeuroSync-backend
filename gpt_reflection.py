@@ -5,7 +5,7 @@ import os
 
 router = APIRouter()
 
-# Set your OpenAI API key securely
+
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class ReflectionInput(BaseModel):
