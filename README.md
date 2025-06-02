@@ -40,11 +40,7 @@ export OPENAI_API_KEY=your-key-here
   "serotonin": 0.77,
   "oxytocin": 0.72,
   "xbox_game": "Journey to the Savage Planet",
-  "spotify_playlist": "Focus Boost",
-  "match_reason": "...",
-  "brain_regions": {...},
-  "reflection_tags": [...],
-  "circadian_note": [...]
+  "spotify_playlist": "Focus Boost"
 }
 ```
 
@@ -54,9 +50,6 @@ export OPENAI_API_KEY=your-key-here
 - Journaling is supported by `/reflect`, which returns scent/music strategies and text reflections
 - Metadata can be accessed via `/twins`, which supports filtering by gender, age range, life stage, and more
 
-## Deployment
-- Recommended platform: Render
-- Make sure vector_store folder exists before starting
-
-## License
-For academic and non-commercial use only.
+## Live Demo
+- 🌐 Frontend App: [https://neurosync.streamlit.app](https://neurosync.streamlit.app)
+- 🧠 Backend API: [https://cogniscent-backend-ygrv.onrender.com](https://cogniscent-backend-ygrv.onrender.com)
