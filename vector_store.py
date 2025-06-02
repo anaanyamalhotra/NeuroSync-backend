@@ -6,23 +6,23 @@ import json
 import hashlib
 from datetime import datetime
 
-VECTOR_DIM = 5  # dopamine, serotonin, oxytocin, GABA, cortisol
+VECTOR_DIM = 5  
 INDEX_PATH = "vector_store/faiss_index.index"
 META_PATH = "vector_store/metadata.json"
 
 os.makedirs("vector_store", exist_ok=True)
 
-# === Load or create index ===
+
 def load_index():
     if os.path.exists(INDEX_PATH):
         return faiss.read_index(INDEX_PATH)
     return faiss.IndexFlatL2(VECTOR_DIM)
 
-# === Save index ===
+
 def save_index(index):
     faiss.write_index(index, INDEX_PATH)
 
-# === Load metadata ===
+
 def load_metadata():
     if os.path.exists(META_PATH):
         with open(META_PATH, "r") as f:
@@ -41,12 +41,12 @@ def load_metadata():
         return clean_metadata
     return []
 
-# === Save metadata ===
+
 def save_metadata(metadata):
     with open(META_PATH, "w") as f:
         json.dump(metadata, f, indent=2)
 
-# === Add new twin to store ===
+
 def add_twin(twin, vector=None):
     index = load_index()
     metadata = load_metadata()
@@ -77,7 +77,7 @@ def add_twin(twin, vector=None):
     save_index(index)
     save_metadata(metadata)
 
-# === Search for similar twins ===
+
 def search_similar_twins(query_vector, top_k=5, filters=None):
     index = load_index()
     metadata = load_metadata()
