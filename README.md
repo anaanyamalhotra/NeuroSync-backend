@@ -51,5 +51,5 @@ export OPENAI_API_KEY=your-key-here
 - Metadata can be accessed via `/twins`, which supports filtering by gender, age range, life stage, and more
 
 ## Live Demo
-- 🌐 Frontend App: [https://neurosync.streamlit.app](https://neurosync.streamlit.app)
+- 🌐 Frontend App: [https://neurosync-ananya.streamlit.app/](https://neurosync-ananya.streamlit.app/)
 - 🧠 Backend API: [https://cogniscent-backend-ygrv.onrender.com](https://cogniscent-backend-ygrv.onrender.com)
